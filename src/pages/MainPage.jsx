@@ -53,7 +53,7 @@ export default function MainPage() {
         textAlign: 'center', padding: '2rem', position: 'relative', zIndex: 1,
       }}>
         <div style={{ fontSize: '0.8rem', color: '#f59e0b', letterSpacing: '0.5em', marginBottom: '1rem', textTransform: 'uppercase' }}>
-          Welcome to
+          Welcome to ♠
         </div>
 
         <h1 style={{
