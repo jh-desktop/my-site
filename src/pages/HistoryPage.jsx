@@ -17,13 +17,31 @@ const S = {
   title: { color: '#f59e0b', fontSize: '1.5rem', fontWeight: '700' },
   addBtn: { padding: '0.6rem 1.5rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)', color: '#000', fontWeight: '700', border: 'none', borderRadius: '0.5rem', cursor: 'pointer', fontSize: '0.875rem' },
   card: { background: '#111827', border: '1px solid #1f2937', borderRadius: '0.75rem', padding: '1.25rem', marginBottom: '1rem' },
-  input: { width: '100%', padding: '0.65rem 0.875rem', background: '#1f2937', border: '1px solid #374151', borderRadius: '0.5rem', color: '#f9fafb', fontSize: '0.9rem', outline: 'none', marginBottom: '0.75rem' },
   select: { width: '100%', padding: '0.65rem 0.875rem', background: '#1f2937', border: '1px solid #374151', borderRadius: '0.5rem', color: '#f9fafb', fontSize: '0.9rem', outline: 'none', marginBottom: '0.75rem' },
   row: { display: 'flex', gap: '0.5rem', justifyContent: 'flex-end' },
   cancelBtn: { padding: '0.4rem 0.9rem', background: '#1f2937', color: '#9ca3af', border: '1px solid #374151', borderRadius: '0.4rem', cursor: 'pointer', fontSize: '0.8rem' },
   saveBtn: { padding: '0.4rem 0.9rem', background: '#f59e0b', color: '#000', border: 'none', borderRadius: '0.4rem', cursor: 'pointer', fontSize: '0.8rem', fontWeight: '600' },
   delBtn: { padding: '0.3rem 0.75rem', background: '#7f1d1d', color: '#fca5a5', border: 'none', borderRadius: '0.3rem', cursor: 'pointer', fontSize: '0.75rem' },
   empty: { textAlign: 'center', color: '#6b7280', padding: '3rem' },
+  fieldError: { color: '#f87171', fontSize: '0.75rem', marginTop: '-0.5rem', marginBottom: '0.75rem' },
+}
+
+const input = (hasError) => ({
+  width: '100%', padding: '0.65rem 0.875rem',
+  background: '#1f2937',
+  border: `1px solid ${hasError ? '#ef4444' : '#374151'}`,
+  borderRadius: '0.5rem', color: '#f9fafb', fontSize: '0.9rem', outline: 'none',
+  marginBottom: hasError ? '0.25rem' : '0.75rem',
+})
+
+const validate = (form) => {
+  const errors = {}
+  if (!form.date) errors.date = '날짜를 선택해주세요.'
+  if (!form.buyer.trim()) errors.buyer = '구매자 닉네임을 입력해주세요.'
+  if (!form.seller.trim()) errors.seller = '판매자 닉네임을 입력해주세요.'
+  if (!form.amount.trim()) errors.amount = '금액을 입력해주세요.'
+  else if (!/^\d+$/.test(form.amount.replace(/,/g, ''))) errors.amount = '숫자만 입력해주세요.'
+  return errors
 }
 
 const EMPTY = { type: '구매', date: '', buyer: '', seller: '', amount: '', note: '' }
@@ -32,8 +50,12 @@ export default function HistoryPage() {
   const [history, setHistory] = useState([])
   const [adding, setAdding] = useState(false)
   const [form, setForm] = useState(EMPTY)
+  const [errors, setErrors] = useState({})
 
-  const set = (key) => (e) => setForm(p => ({ ...p, [key]: e.target.value }))
+  const set = (key) => (e) => {
+    setForm(p => ({ ...p, [key]: e.target.value }))
+    if (errors[key]) setErrors(p => ({ ...p, [key]: '' }))
+  }
 
   useEffect(() => {
     const q = query(collection(db, 'scoreHistory'), orderBy('createdAt', 'desc'))
@@ -41,10 +63,18 @@ export default function HistoryPage() {
   }, [])
 
   const handleSave = async () => {
-    if (!form.date || !form.amount) return
+    const errs = validate(form)
+    if (Object.keys(errs).length > 0) { setErrors(errs); return }
     await addDoc(collection(db, 'scoreHistory'), { ...form, createdAt: serverTimestamp() })
     setAdding(false)
     setForm(EMPTY)
+    setErrors({})
+  }
+
+  const handleCancel = () => {
+    setAdding(false)
+    setForm(EMPTY)
+    setErrors({})
   }
 
   const handleDelete = async (id) => {
@@ -65,13 +95,23 @@ export default function HistoryPage() {
               <option value="구매">구매</option>
               <option value="판매">판매</option>
             </select>
-            <input style={S.input} type="date" value={form.date} onChange={set('date')} />
-            <input style={S.input} placeholder="구매자 닉네임" value={form.buyer} onChange={set('buyer')} />
-            <input style={S.input} placeholder="판매자 닉네임" value={form.seller} onChange={set('seller')} />
-            <input style={S.input} placeholder="금액 / 점수" value={form.amount} onChange={set('amount')} />
-            <input style={S.input} placeholder="메모 (선택)" value={form.note} onChange={set('note')} />
+
+            <input style={input(errors.date)} type="date" value={form.date} onChange={set('date')} />
+            {errors.date && <div style={S.fieldError}>{errors.date}</div>}
+
+            <input style={input(errors.buyer)} placeholder="구매자 닉네임" value={form.buyer} onChange={set('buyer')} />
+            {errors.buyer && <div style={S.fieldError}>{errors.buyer}</div>}
+
+            <input style={input(errors.seller)} placeholder="판매자 닉네임" value={form.seller} onChange={set('seller')} />
+            {errors.seller && <div style={S.fieldError}>{errors.seller}</div>}
+
+            <input style={input(errors.amount)} placeholder="금액 (숫자만 입력)" value={form.amount} onChange={set('amount')} />
+            {errors.amount && <div style={S.fieldError}>{errors.amount}</div>}
+
+            <input style={input(false)} placeholder="메모 (선택)" value={form.note} onChange={set('note')} />
+
             <div style={S.row}>
-              <button style={S.cancelBtn} onClick={() => { setAdding(false); setForm(EMPTY) }}>취소</button>
+              <button style={S.cancelBtn} onClick={handleCancel}>취소</button>
               <button style={S.saveBtn} onClick={handleSave}>저장</button>
             </div>
           </div>
