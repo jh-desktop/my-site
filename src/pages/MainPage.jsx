@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { collection, getCountFromServer } from 'firebase/firestore'
 import { db } from '../firebase'
+import { useAuth } from '../contexts/AuthContext'
 
 const SUITS = [
   { symbol: '♠', color: '#f59e0b' },
@@ -23,6 +24,7 @@ const POSITIONS = [
 
 export default function MainPage() {
   const [memberCount, setMemberCount] = useState(0)
+  const { user, member } = useAuth()
 
   useEffect(() => {
     getCountFromServer(collection(db, 'members'))
@@ -78,8 +80,7 @@ export default function MainPage() {
           display: 'flex', gap: '4rem', marginBottom: '3.5rem',
           padding: '1.5rem 3rem',
           background: 'rgba(255,255,255,0.03)',
-          border: '1px solid #1f2937',
-          borderRadius: '1rem',
+          border: '1px solid #1f2937', borderRadius: '1rem',
         }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: '2.5rem', fontWeight: '700', color: '#f59e0b', lineHeight: 1 }}>{memberCount}</div>
@@ -92,31 +93,48 @@ export default function MainPage() {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
-          <Link to="/register" style={{
-            padding: '0.9rem 2.5rem',
-            background: 'linear-gradient(135deg, #f59e0b, #d97706)',
-            color: '#000', fontWeight: '700', borderRadius: '0.5rem',
-            textDecoration: 'none', fontSize: '1rem',
-            boxShadow: '0 0 25px rgba(245, 158, 11, 0.3)',
-          }}>
-            멤버 등록
-          </Link>
-          <Link to="/schedule" style={{
-            padding: '0.9rem 2.5rem', background: 'transparent',
-            color: '#f59e0b', fontWeight: '700', borderRadius: '0.5rem',
-            textDecoration: 'none', fontSize: '1rem', border: '2px solid #f59e0b',
-          }}>
-            스케줄 보기
-          </Link>
-          <Link to="/history" style={{
-            padding: '0.9rem 2.5rem', background: 'transparent',
-            color: '#6b7280', fontWeight: '700', borderRadius: '0.5rem',
-            textDecoration: 'none', fontSize: '1rem', border: '2px solid #374151',
-          }}>
-            점수 히스토리
-          </Link>
-        </div>
+        {user ? (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0.75rem' }}>
+            <p style={{ color: '#9ca3af', marginBottom: '0.5rem' }}>
+              환영합니다, <span style={{ color: '#f59e0b', fontWeight: '600' }}>{member?.nickname || member?.name}</span>님!
+            </p>
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <Link to="/schedule" style={{
+                padding: '0.9rem 2.5rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+                color: '#000', fontWeight: '700', borderRadius: '0.5rem',
+                textDecoration: 'none', fontSize: '1rem',
+                boxShadow: '0 0 25px rgba(245, 158, 11, 0.3)',
+              }}>
+                스케줄 보기
+              </Link>
+              <Link to="/history" style={{
+                padding: '0.9rem 2.5rem', background: 'transparent',
+                color: '#f59e0b', fontWeight: '700', borderRadius: '0.5rem',
+                textDecoration: 'none', fontSize: '1rem', border: '2px solid #f59e0b',
+              }}>
+                점수 히스토리
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', justifyContent: 'center' }}>
+            <Link to="/login" style={{
+              padding: '0.9rem 2.5rem', background: 'linear-gradient(135deg, #f59e0b, #d97706)',
+              color: '#000', fontWeight: '700', borderRadius: '0.5rem',
+              textDecoration: 'none', fontSize: '1rem',
+              boxShadow: '0 0 25px rgba(245, 158, 11, 0.3)',
+            }}>
+              로그인하기
+            </Link>
+            <Link to="/register" style={{
+              padding: '0.9rem 2.5rem', background: 'transparent',
+              color: '#f59e0b', fontWeight: '700', borderRadius: '0.5rem',
+              textDecoration: 'none', fontSize: '1rem', border: '2px solid #f59e0b',
+            }}>
+              멤버 등록
+            </Link>
+          </div>
+        )}
       </div>
     </div>
   )
