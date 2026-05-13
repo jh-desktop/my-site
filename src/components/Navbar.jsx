@@ -20,6 +20,12 @@ export default function Navbar() {
         >
           프로젝트
         </NavLink>
+        <NavLink
+          to="/frameworks"
+          className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}
+        >
+          Vue vs React
+        </NavLink>
       </div>
     </nav>
   )

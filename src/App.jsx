@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import HomePage from './pages/HomePage'
 import ProjectsPage from './pages/ProjectsPage'
+import FrameworkPage from './pages/FrameworkPage'
 
 export default function App() {
   return (
@@ -11,6 +12,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/projects" element={<ProjectsPage />} />
+        <Route path="/frameworks" element={<FrameworkPage />} />
       </Routes>
     </BrowserRouter>
   )
