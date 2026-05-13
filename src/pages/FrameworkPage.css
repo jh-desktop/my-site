@@ -279,12 +279,24 @@
 .fw-hl-badge.vue   { background: rgba(66,184,131,0.2); color: var(--vue); }
 .fw-hl-badge.react { background: rgba(97,218,251,0.15); color: var(--react-c); }
 
+/* ── Demo Split (Vue | React 나란히) ──────── */
+.fw-demo-split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+@media (max-width: 700px) {
+  .fw-demo-split { grid-template-columns: 1fr; }
+}
+
 /* ── Demo Wrap ────────────────────────────── */
 .fw-demo-wrap {
   border: 1px solid var(--border2);
   border-radius: 0.75rem;
   overflow: hidden;
   background: var(--surface);
+  min-width: 0;
 }
 
 .fw-demo-label {
@@ -302,12 +314,24 @@
 .fw-demo-dot {
   width: 7px; height: 7px;
   border-radius: 50%;
-  background: var(--green);
-  box-shadow: 0 0 6px var(--green);
+  background: var(--vue);
+  box-shadow: 0 0 6px var(--vue);
+  flex-shrink: 0;
+}
+.fw-demo-dot.react {
+  background: var(--react-c);
+  box-shadow: 0 0 6px var(--react-c);
+}
+
+.fw-demo-same-note {
+  margin-left: auto;
+  font-size: 0.7rem;
+  color: var(--muted);
+  opacity: 0.6;
 }
 
 .fw-demo-body {
-  padding: 1.75rem 2rem;
+  padding: 1.5rem;
 }
 
 /* ══════════════════════════════════════════════

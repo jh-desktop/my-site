@@ -614,14 +614,27 @@ export default function FrameworkPage() {
             {/* 특징 */}
             <Highlights items={ex.highlights} />
 
-            {/* 라이브 데모 */}
-            <div className="fw-demo-wrap">
-              <div className="fw-demo-label">
-                <span className="fw-demo-dot" />
-                Live Demo
+            {/* 라이브 데모 — Vue / React 각각 */}
+            <div className="fw-demo-split">
+              <div className="fw-demo-wrap">
+                <div className="fw-demo-label">
+                  <span className="fw-demo-dot" />
+                  <span className="fw-badge vue">Vue 3</span>
+                  <span className="fw-demo-same-note">동일한 결과물</span>
+                </div>
+                <div className="fw-demo-body">
+                  <ex.Demo />
+                </div>
               </div>
-              <div className="fw-demo-body">
-                <ex.Demo />
+              <div className="fw-demo-wrap">
+                <div className="fw-demo-label">
+                  <span className="fw-demo-dot react" />
+                  <span className="fw-badge react">React 19</span>
+                  <span className="fw-demo-same-note">동일한 결과물</span>
+                </div>
+                <div className="fw-demo-body">
+                  <ex.Demo />
+                </div>
               </div>
             </div>
           </section>
