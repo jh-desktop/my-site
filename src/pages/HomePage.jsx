@@ -22,6 +22,9 @@ export default function HomePage() {
           <Link to="/projects" className="btn-primary">
             프로젝트 보기 →
           </Link>
+          <a href="https://blog.naver.com/yoonja_dwan" target="_blank" rel="noreferrer" className="btn-secondary">
+            블로그 ↗
+          </a>
         </div>
 
         <div className="hero-stats">
