@@ -6,6 +6,7 @@ export const projects = [
     description: '홀덤 플레이어를 위한 뱅크롤 관리 앱. 캘린더 기록, 월별 순위표, 워크스페이스 팀 기능, 게시판, FCM 푸시 알림. PWA 설치 지원.',
     tech: ['React', 'Firebase', 'FCM', 'PWA', 'Vite', 'Vercel'],
     url: 'https://bankroll-manager-gamma.vercel.app',
+    icon: '♠️',
     category: 'tool',
     status: 'live',
   },

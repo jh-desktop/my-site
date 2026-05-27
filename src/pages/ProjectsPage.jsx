@@ -32,7 +32,7 @@ export default function ProjectsPage() {
           {filtered.map(p => (
             <div key={p.id} className="project-card">
               <div className="card-top">
-                <div className="card-icon">{ICONS[p.category] || ICONS.default}</div>
+                <div className="card-icon">{p.icon || ICONS[p.category] || ICONS.default}</div>
                 <span className="card-status">live</span>
               </div>
 
@@ -53,7 +53,7 @@ export default function ProjectsPage() {
                   ? <a href={p.url} target="_blank" rel="noreferrer" className="card-link">
                       바로가기 ↗
                     </a>
-                  : <span className="card-no-link">비공개</span>
+                  : <span className="card-no-link">🔒 비공개</span>
                 }
               </div>
             </div>
