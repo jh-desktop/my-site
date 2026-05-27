@@ -1,11 +1,11 @@
 export const projects = [
   {
     id: 1,
-    name: '뱅크롤 관리',
-    nameEn: 'Bankroll Manager',
-    description: '포커 플레이어를 위한 수익·손실 추적 시스템. 캘린더 기록, 월별 순위표, 구글 로그인, 게시판, FCM 푸시 알림 탑재.',
-    tech: ['React', 'Firebase', 'FCM', 'Cloudinary', 'Vite', 'Vercel'],
-    url: null,
+    name: '그라인더: 홀덤 뱅크롤 관리',
+    nameEn: 'Grinder: Bankroll Manager',
+    description: '홀덤 플레이어를 위한 뱅크롤 관리 앱. 캘린더 기록, 월별 순위표, 워크스페이스 팀 기능, 게시판, FCM 푸시 알림. PWA 설치 지원.',
+    tech: ['React', 'Firebase', 'FCM', 'PWA', 'Vite', 'Vercel'],
+    url: 'https://bankroll-manager-gamma.vercel.app',
     category: 'tool',
     status: 'live',
   },
@@ -87,6 +87,16 @@ export const projects = [
     tech: ['Python', 'OpenCV', 'AI'],
     url: null,
     category: 'ai',
+    status: 'live',
+  },
+  {
+    id: 12,
+    name: 'Sugar Rush',
+    nameEn: 'Sugar Rush Slot',
+    description: '프라그마틱 Sugar Rush 클론. 7×7 클러스터 페이 슬롯 머신. 스캐터 → 프리스핀, 멀티플라이어 캐스케이드, 구글 로그인 + Firebase 게임머니 시스템.',
+    tech: ['React', 'Firebase', 'Web Audio API', 'Vite', 'Vercel'],
+    url: 'https://slot-game-ruddy.vercel.app',
+    category: 'game',
     status: 'live',
   },
   {
