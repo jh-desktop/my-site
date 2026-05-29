@@ -26,6 +26,12 @@ export default function Navbar() {
         >
           Vue vs React
         </NavLink>
+        <NavLink
+          to="/docs"
+          className={({ isActive }) => 'nav-link' + (isActive ? ' active' : '')}
+        >
+          참고자료
+        </NavLink>
       </div>
     </nav>
   )

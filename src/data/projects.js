@@ -111,6 +111,17 @@ export const projects = [
     status: 'live',
   },
   {
+    id: 13,
+    name: 'LOL 내전 팀뽑기',
+    nameEn: 'LOL Draft',
+    description: '친구들과 LOL 내전 팀을 랜덤으로 짜주는 앱. 최대 10명 입력, 내기 항목 설정, 카톡 공유 지원.',
+    tech: ['React', 'Vite', 'Vercel'],
+    url: 'https://lol-draft-kohl.vercel.app',
+    icon: '⚔️',
+    category: 'game',
+    status: 'live',
+  },
+  {
     id: 10,
     name: '포커 오버레이',
     nameEn: 'Poker Overlay',
