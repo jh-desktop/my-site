@@ -16,6 +16,13 @@ const LINKS = [
     url: 'https://blog.naver.com/yoonja_dwan',
     icon: '📝',
   },
+  {
+    id: 'prime1',
+    title: 'Prime Poker 다운로드',
+    desc: '다바오 웹 전용 앱 다운로드 페이지',
+    url: 'https://muz.so/Prime1',
+    icon: '♠️',
+  },
 ]
 
 const BASE_URL = 'https://my-site-six-sepia.vercel.app'
