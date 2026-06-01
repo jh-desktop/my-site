@@ -23,6 +23,13 @@ const LINKS = [
     url: 'https://muz.so/Prime1',
     icon: '♠️',
   },
+  {
+    id: 'protonvpn',
+    title: 'ProtonVPN 설치파일',
+    desc: 'ProtonVPN Windows 64bit v4.4.0',
+    url: 'https://protonvpn.com/download/ProtonVPN_v4.4.0_x64.exe',
+    icon: '🔒',
+  },
 ]
 
 const BASE_URL = 'https://my-site-six-sepia.vercel.app'
