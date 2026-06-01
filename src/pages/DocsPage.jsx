@@ -29,6 +29,7 @@ const LINKS = [
     desc: 'ProtonVPN Windows 64bit v4.4.0',
     url: 'https://protonvpn.com/download/ProtonVPN_v4.4.0_x64.exe',
     icon: '🔒',
+    label: '⬇ 설치하기',
   },
 ]
 
@@ -53,7 +54,7 @@ export default function DocsPage() {
               </div>
               <div className="doc-actions">
                 <a href={link.url} target="_blank" rel="noreferrer" className="card-link">
-                  방문하기 ↗
+                  {link.label || '방문하기 ↗'}
                 </a>
               </div>
             </div>
