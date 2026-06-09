@@ -31,6 +31,20 @@ const LINKS = [
     icon: '🔒',
     label: '⬇ 설치하기',
   },
+  {
+    id: 'disney',
+    title: '디즈니+ 홈',
+    desc: '디즈니플러스 홈페이지 바로가기',
+    url: 'https://www.disneyplus.com',
+    icon: '🏰',
+  },
+  {
+    id: 'netflix',
+    title: '넷플릭스 홈',
+    desc: '넷플릭스 홈페이지 바로가기',
+    url: 'https://www.netflix.com',
+    icon: '🎬',
+  },
 ]
 
 const BASE_URL = 'https://my-site-six-sepia.vercel.app'
