@@ -6,6 +6,13 @@ const DOCS = [
     file: '/clark-travel-guide.pptx',
     icon: '📊',
   },
+  {
+    id: 2,
+    title: 'Clark Travel APK',
+    desc: '클락 여행 안드로이드 앱 (백그라운드 위치 공유)',
+    file: '/ClarkTravel.apk',
+    icon: '📱',
+  },
 ]
 
 const LINKS = [
