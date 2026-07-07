@@ -122,6 +122,17 @@ export const projects = [
     status: 'live',
   },
   {
+    id: 14,
+    name: '홀덤 녹화기',
+    nameEn: 'Holdem Recorder',
+    description: '온라인 홀덤 세션을 브라우저에서 바로 녹화. 전체화면 또는 특정 창 캡처 후 지정 폴더에 WebM으로 저장. 라이브러리에서 인앱 재생 및 관리.',
+    tech: ['React', 'MediaRecorder API', 'File System Access API', 'IndexedDB', 'Vite', 'Vercel'],
+    url: 'https://holdem-recorder.vercel.app',
+    icon: '🎥',
+    category: 'tool',
+    status: 'live',
+  },
+  {
     id: 10,
     name: '포커 오버레이',
     nameEn: 'Poker Overlay',
