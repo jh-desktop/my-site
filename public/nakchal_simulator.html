@@ -120,6 +120,25 @@ details .body{padding:0 0 14px}
 .num-pill.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;}
 code.inline{background:var(--grid);padding:1px 5px;border-radius:4px;font-size:12px;}
 .tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:20px;background:#e7f2ec;color:var(--accent);font-family:var(--sans);font-weight:700;}
+
+/* ── CALC TAB ── */
+.aval-toggle{display:flex;gap:10px;margin-bottom:16px;}
+.aval-btn{flex:1;padding:10px;border-radius:8px;border:2px solid var(--line);background:#fff;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;transition:all .15s;}
+.aval-btn.active.yes{border-color:#1d4ed8;background:#eff6ff;color:#1d4ed8;}
+.aval-btn.active.no{border-color:var(--accent);background:#f0fdf4;color:var(--accent);}
+.calc-result-box{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;}
+.calc-result-header{display:flex;align-items:center;gap:8px;padding:12px 14px;border-bottom:1px solid var(--line);background:var(--grid);}
+.calc-result-title{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent);font-weight:700;}
+.big-result{background:var(--panel);border:2px solid var(--accent);border-radius:10px;padding:16px;margin-bottom:14px;}
+.big-result-label{font-size:10px;text-transform:uppercase;color:var(--accent);font-weight:700;letter-spacing:.07em;margin-bottom:6px;}
+.big-result-val{font-family:var(--mono);font-size:28px;font-weight:800;color:var(--ink);}
+.big-result-sub{font-size:12px;color:var(--muted);margin-top:4px;font-family:var(--mono);}
+.rev-box{background:#f8f7ff;border:1px solid #c4b5fd;border-radius:10px;padding:14px;}
+.rev-title{font-size:11px;text-transform:uppercase;color:#4f46e5;font-weight:700;letter-spacing:.07em;margin-bottom:10px;}
+.rev-result{font-family:var(--mono);font-size:18px;font-weight:800;color:#4f46e5;margin-top:6px;}
+.rev-sub{font-size:11px;color:var(--muted);margin-top:3px;}
+tr.best-row td{background:#fef9c3;font-weight:700;}
+tr.near-row td{background:#f0fdf4;}
 </style>
 </head>
 <body>
@@ -129,6 +148,7 @@ code.inline{background:var(--grid);padding:1px 5px;border-radius:4px;font-size:1
   <div class="tabs">
     <button class="tab-btn active" data-tab="sim">📊 시뮬레이션</button>
     <button class="tab-btn" data-tab="analysis">📈 분석 &amp; 예측</button>
+    <button class="tab-btn" data-tab="calc">💰 투찰 계산기</button>
   </div>
 </div>
 
@@ -315,6 +335,123 @@ code.inline{background:var(--grid);padding:1px 5px;border-radius:4px;font-size:1
     </div>
   </div>
 </div><!-- /tab-analysis -->
+
+<!-- ══════════════════════════════════════
+     TAB 3: 투찰 계산기
+════════════════════════════════════════ -->
+<div id="tab-calc" class="tab-panel">
+  <div class="page-header">
+    <h1>투찰 금액 계산기</h1>
+    <p>사정률 → 투찰금액 계산 (소수점 이하 절상) · 투찰금액 역산</p>
+  </div>
+  <div class="layout">
+    <!-- LEFT -->
+    <div>
+      <div class="card">
+        <h2>0. A값 여부</h2>
+        <div class="aval-toggle">
+          <button class="aval-btn active no" data-av="no" id="av-no">A값 없음</button>
+          <button class="aval-btn yes" data-av="yes" id="av-yes">A값 있음</button>
+        </div>
+
+        <h2 style="margin-top:4px">기본 입력</h2>
+        <label>기초금액 (원)</label>
+        <input type="text" id="c-base" value="100,000,000" inputmode="numeric">
+
+        <label>낙찰하한율 (%)</label>
+        <input type="number" id="c-han" value="87.745" step="0.001">
+        <div class="hint">예: 87.745 → 낙찰하한율 87.745%</div>
+
+        <div id="c-aval-wrap" style="display:none">
+          <label>A값 (원)</label>
+          <input type="text" id="c-aval" value="0" inputmode="numeric">
+          <div class="hint">설계변경 등 A값이 있는 경우 입력.</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>사정률 입력 방식</h2>
+        <div class="seg" id="c-mode" style="margin-bottom:12px">
+          <button data-cm="manual" class="active">직접 입력</button>
+          <button data-cm="range">범위 생성</button>
+        </div>
+
+        <!-- 직접 입력 -->
+        <div id="c-manual-wrap">
+          <textarea id="c-rates" rows="8" placeholder="사정률(%) 직접 입력&#10;줄바꿈 또는 쉼표 구분&#10;&#10;예:&#10;101.01010&#10;99.55231&#10;98.11259&#10;100.88881"></textarea>
+          <div class="hint">시뮬레이션 탭에서 나온 사정률을 그대로 붙여넣기 가능.</div>
+        </div>
+
+        <!-- 범위 생성 -->
+        <div id="c-range-wrap" style="display:none">
+          <div class="row">
+            <div><label>시작 (%)</label><input type="number" id="c-rlo" value="98" step="0.01"></div>
+            <div><label>끝 (%)</label><input type="number" id="c-rhi" value="102" step="0.01"></div>
+          </div>
+          <label>간격 (%)</label>
+          <div class="seg" id="c-step">
+            <button data-s="0.5">0.5</button>
+            <button data-s="0.25" class="active">0.25</button>
+            <button data-s="0.1">0.1</button>
+            <button data-s="0.05">0.05</button>
+          </div>
+        </div>
+
+        <button class="btn-run" id="c-run">계산하기</button>
+      </div>
+
+      <div class="card">
+        <h2>역산 · 투찰금액 → 사정률</h2>
+        <label>투찰 희망금액 (원)</label>
+        <input type="text" id="c-rev-bid" placeholder="예: 87,654,321" inputmode="numeric">
+        <button class="btn-run" id="c-rev-run" style="margin-top:12px">역산하기</button>
+        <div id="c-rev-result" class="rev-box" style="display:none;margin-top:14px">
+          <div class="rev-title">역산 결과</div>
+          <div id="c-rev-rate" class="rev-result">—</div>
+          <div id="c-rev-sub" class="rev-sub"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT -->
+    <div>
+      <div id="c-empty" class="card">
+        <div class="empty"><div class="big">💰</div>왼쪽에서 값을 입력하고 <strong>계산하기</strong>를 눌러주세요.</div>
+      </div>
+
+      <div id="c-results" style="display:none">
+        <div id="c-stat-grid" class="stat-grid" style="margin-bottom:14px"></div>
+
+        <!-- 공식 표시 -->
+        <div class="card" style="margin-bottom:14px">
+          <h2>적용 공식</h2>
+          <div id="c-formula" style="font-size:13px;font-family:var(--mono);line-height:2;color:var(--ink)"></div>
+        </div>
+
+        <!-- 결과 테이블 -->
+        <div class="calc-result-box">
+          <div class="calc-result-header">
+            <span class="calc-result-title">사정률별 투찰금액</span>
+            <span class="sp"></span>
+            <span id="c-tbl-count" style="font-size:11px;color:var(--muted)"></span>
+            <button class="btn-sub" id="c-export" style="margin-left:8px">CSV</button>
+          </div>
+          <div class="tbl-scroll" style="max-height:520px">
+            <table id="c-tbl">
+              <tr>
+                <th style="text-align:left">사정률 (%)</th>
+                <th>기준가격 (원)</th>
+                <th>투찰금액 (원)</th>
+                <th>기준가 대비</th>
+              </tr>
+            </table>
+          </div>
+        </div>
+        <div class="hint" style="margin-top:8px">🟡 투찰금액이 기준가격과 가장 근접한 행 강조 · 🟢 기준가격 ±0.5% 이내 범위</div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-calc -->
 
 </div><!-- /wrap -->
 
@@ -666,6 +803,184 @@ $('a-export').addEventListener('click',()=>{
   aRates.forEach((v,i)=>{csv+=`${i+1},${aDates[i]||''},${v}\n`;});
   const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nakchal_analysis.csv';a.click();
+});
+
+/* ────────────────────────────────────────
+   CALC (Tab 3) · 투찰 계산기
+──────────────────────────────────────── */
+let cHasA=false, cCm='manual', cStep=0.25, cRows=[];
+
+// A값 토글
+document.getElementById('av-no').addEventListener('click',()=>{ cHasA=false; cToggleA(); });
+document.getElementById('av-yes').addEventListener('click',()=>{ cHasA=true;  cToggleA(); });
+function cToggleA(){
+  document.getElementById('av-no').classList.toggle('active',!cHasA);
+  document.getElementById('av-yes').classList.toggle('active',cHasA);
+  document.getElementById('c-aval-wrap').style.display=cHasA?'':'none';
+}
+
+// 입력 방식 토글
+$('c-mode').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  cCm=b.dataset.cm;
+  [...$('c-mode').children].forEach(x=>x.classList.toggle('active',x===b));
+  $('c-manual-wrap').style.display=cCm==='manual'?'':'none';
+  $('c-range-wrap').style.display=cCm==='range'?'':'none';
+});
+
+// 간격 토글
+$('c-step').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  cStep=parseFloat(b.dataset.s);
+  [...$('c-step').children].forEach(x=>x.classList.toggle('active',x===b));
+});
+
+// 숫자 포맷 입력
+['c-base','c-aval','c-rev-bid'].forEach(id=>{
+  const el=$( id);
+  if(!el)return;
+  el.addEventListener('input',e=>{
+    const v=e.target.value.replace(/[^\d]/g,'');
+    e.target.value=v?Number(v).toLocaleString('ko-KR'):'';
+  });
+});
+
+function cGetBase(){ return Number($('c-base').value.replace(/[^\d]/g,'')); }
+function cGetHan(){  return parseFloat($('c-han').value); }
+function cGetAval(){ return Number($('c-aval').value.replace(/[^\d]/g,'')||'0'); }
+
+// 공식: A없음 → 기초 × 사정 × 하한, A있음 → (기초 × 사정 - A) × 하한 + A
+function cCalcBid(sajeong){
+  const base=cGetBase(), han=cGetHan()/100, aval=cHasA?cGetAval():0;
+  if(cHasA){
+    return Math.ceil((base * sajeong/100 - aval) * han + aval);
+  }else{
+    return Math.ceil(base * sajeong/100 * han);
+  }
+}
+function cCalcBase(sajeong){ return cGetBase() * sajeong/100; }
+
+// 역산: 투찰금액 → 사정률
+function cRevSajeong(bid){
+  const base=cGetBase(), han=cGetHan()/100, aval=cHasA?cGetAval():0;
+  if(cHasA){
+    // bid = ceil((base*rate/100 - A)*han + A)  ≈  (base*rate/100 - A)*han + A
+    // (bid - A)/han + A = base*rate/100
+    return ((bid - aval)/han + aval) / base * 100;
+  }else{
+    // bid = ceil(base * rate/100 * han)  ≈  base * rate/100 * han
+    return bid / base / han * 100;
+  }
+}
+
+// 사정률 목록 수집
+function cGetSajeongRates(){
+  if(cCm==='range'){
+    const lo=parseFloat($('c-rlo').value)||98;
+    const hi=parseFloat($('c-rhi').value)||102;
+    const rates=[];
+    for(let r=lo;r<=hi+cStep*0.001;r+=cStep) rates.push(Math.round(r*100000)/100000);
+    return rates;
+  }else{
+    return $('c-rates').value.split(/[\n,\s，]+/)
+      .map(s=>s.replace(/[^\d.]/g,'')).filter(Boolean).map(Number).filter(n=>n>0);
+  }
+}
+
+$('c-run').addEventListener('click',()=>{
+  const base=cGetBase(), han=cGetHan();
+  if(!base){alert('기초금액을 입력하세요.');return;}
+  if(!han){alert('낙찰하한율을 입력하세요.');return;}
+  const rates=cGetSajeongRates();
+  if(!rates.length){alert('사정률을 입력하거나 범위를 설정하세요.');return;}
+
+  cRows=rates.map(r=>({
+    rate:r,
+    base:cCalcBase(r),
+    bid:cCalcBid(r),
+  }));
+  cRender();
+});
+
+function cRender(){
+  if(!cRows.length)return;
+  $('c-empty').style.display='none';
+  $('c-results').style.display='';
+
+  const base=cGetBase(), han=cGetHan(), aval=cHasA?cGetAval():0;
+  const bids=cRows.map(r=>r.bid);
+  const minBid=Math.min(...bids), maxBid=Math.max(...bids);
+  const avgBid=bids.reduce((a,b)=>a+b,0)/bids.length;
+
+  $('c-stat-grid').innerHTML=`
+    <div class="stat"><div class="k">사정률 개수</div><div class="v">${cRows.length}</div></div>
+    <div class="stat"><div class="k">투찰 최소</div><div class="v sm">${minBid.toLocaleString('ko-KR')}원</div></div>
+    <div class="stat"><div class="k">투찰 최대</div><div class="v sm">${maxBid.toLocaleString('ko-KR')}원</div></div>
+    <div class="stat"><div class="k">투찰 평균</div><div class="v sm">${Math.round(avgBid).toLocaleString('ko-KR')}원</div></div>
+  `;
+
+  // 공식 표시
+  const formulaHtml=cHasA
+    ? `<span style="color:var(--muted)">A값 적용 공식:</span><br>투찰금액 = <b>ceil</b>( (기초금액 × 사정률 − A값) × 낙찰하한율 + A값 )<br>`+
+      `<span style="color:var(--muted)">= ceil( (${base.toLocaleString()}원 × 사정률 − ${aval.toLocaleString()}원) × ${han}% + ${aval.toLocaleString()}원 )</span>`
+    : `<span style="color:var(--muted)">A값 없음 공식:</span><br>투찰금액 = <b>ceil</b>( 기초금액 × 사정률 × 낙찰하한율 )<br>`+
+      `<span style="color:var(--muted)">= ceil( ${base.toLocaleString()}원 × 사정률 × ${han}% )</span>`;
+  $('c-formula').innerHTML=formulaHtml;
+
+  // 기준가격에 가장 근접한 투찰 찾기 (기준가격 ≈ bid인 row)
+  // 실제론 투찰금액이 기준가격보다 낮아야 낙찰이므로, 기준가격 이하 최대값 강조
+  const baseVals=cRows.map(r=>r.base);
+  const avgBase=baseVals.reduce((a,b)=>a+b,0)/baseVals.length;
+
+  // 각 row의 투찰금액이 자신의 기준가격 대비 얼마인지 (기준가격 이하 & 가장 근접)
+  // 가장 기준가격과 근접한 행 (기준가격-투찰금액 최소인 행)
+  const diffs=cRows.map(r=>r.base-r.bid);
+  const minPosDiff=Math.min(...diffs.filter(d=>d>=0).length?diffs.filter(d=>d>=0):[0]);
+
+  let rows='';
+  cRows.forEach(r=>{
+    const diff=r.base-r.bid;
+    const pct=(diff/r.base*100);
+    const isBest=Math.abs(diff-minPosDiff)<0.5&&diff>=0;
+    const isNear=Math.abs(pct)<0.5;
+    const cls=isBest?'best-row':isNear?'near-row':'';
+    const sign=diff>=0?'▼':'▲';
+    const signColor=diff>=0?'var(--accent)':'var(--hot)';
+    rows+=`<tr class="${cls}">
+      <td style="text-align:left">${r.rate.toFixed(5)}</td>
+      <td>${Math.round(r.base).toLocaleString('ko-KR')}</td>
+      <td><strong>${r.bid.toLocaleString('ko-KR')}</strong></td>
+      <td style="color:${signColor}">${sign} ${Math.abs(Math.round(diff)).toLocaleString('ko-KR')}</td>
+    </tr>`;
+  });
+  $('c-tbl').innerHTML=`<tr><th style="text-align:left">사정률 (%)</th><th>기준가격 (원)</th><th>투찰금액 (원)</th><th>기준가 대비</th></tr>${rows}`;
+  $('c-tbl-count').textContent=`${cRows.length}개 사정률`;
+}
+
+// 역산
+$('c-rev-run').addEventListener('click',()=>{
+  const base=cGetBase(),han=cGetHan(),aval=cHasA?cGetAval():0;
+  if(!base||!han){alert('기초금액과 낙찰하한율을 먼저 입력하세요.');return;}
+  const bidStr=$('c-rev-bid').value.replace(/[^\d]/g,'');
+  if(!bidStr){alert('투찰 희망금액을 입력하세요.');return;}
+  const bid=Number(bidStr);
+  const rate=cRevSajeong(bid);
+  $('c-rev-result').style.display='';
+  $('c-rev-rate').textContent=`${rate.toFixed(5)} %`;
+  const baseAtRate=base*rate/100;
+  $('c-rev-sub').innerHTML=
+    `이 사정률에서의 기준가격: ${Math.round(baseAtRate).toLocaleString('ko-KR')}원<br>`+
+    `투찰금액: ${bid.toLocaleString('ko-KR')}원 (기준가 대비 ${(((baseAtRate-bid)/baseAtRate)*100).toFixed(4)}% 낮음)`;
+});
+
+// CSV 내보내기
+$('c-export').addEventListener('click',()=>{
+  if(!cRows.length)return;
+  const aval=cHasA?cGetAval():0;
+  let csv='사정률(%),기준가격(원),투찰금액(원),기준가대비(원)\n';
+  cRows.forEach(r=>{csv+=`${r.rate},${Math.round(r.base)},${r.bid},${Math.round(r.base-r.bid)}\n`;});
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='touchal_calc.csv';a.click();
 });
 </script>
 </body>
