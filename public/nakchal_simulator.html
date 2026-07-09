@@ -3,136 +3,188 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>낙찰 가격 도출 시뮬레이터</title>
+<title>낙찰 가격 분석 시뮬레이터</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
 <style>
-  :root{
-    --ink:#12181f; --paper:#f6f4ee; --panel:#fffdf8; --line:#d8d2c4;
-    --muted:#6b7280; --accent:#1f5f4f; --accent2:#b45309; --hot:#9a2b2b;
-    --grid:#eceae2;
-    --mono:"SF Mono",ui-monospace,"Roboto Mono",Menlo,Consolas,monospace;
-    --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",sans-serif;
-  }
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;}
-  .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px;}
-  header h1{font-size:22px;letter-spacing:-.02em;margin:0 0 4px;}
-  header p{margin:0;color:var(--muted);font-size:13px;}
-  .layout{display:grid;grid-template-columns:340px 1fr;gap:22px;margin-top:22px;}
-  @media(max-width:880px){.layout{grid-template-columns:1fr}}
-  .card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;}
-  .card h2{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin:0 0 14px;font-weight:700;}
-  label{display:block;font-size:12px;color:var(--muted);margin:12px 0 4px;font-weight:600;}
-  label:first-of-type{margin-top:0}
-  input[type=number],input[type=text]{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-family:var(--mono);font-size:14px;background:#fff;}
-  input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent;}
-  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-  .hint{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4;}
-  button{cursor:pointer;font-family:var(--sans);font-weight:600;border-radius:7px;border:1px solid transparent;}
-  .btn-run{width:100%;margin-top:18px;padding:12px;background:var(--accent);color:#fff;font-size:15px;border:none;}
-  .btn-run:hover{background:#174a3d}
-  .btn-sub{padding:7px 12px;font-size:12px;background:#fff;border:1px solid var(--line);color:var(--ink);}
-  .btn-sub:hover{background:var(--grid)}
-  .btn-danger{color:var(--hot);border-color:#e3c9c9;}
-  .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
-  .stat{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:12px 14px;}
-  .stat .k{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
-  .stat .v{font-family:var(--mono);font-size:19px;font-weight:600;margin-top:3px;letter-spacing:-.01em;}
-  .stat .v.small{font-size:15px}
-  .toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
-  .toolbar .sp{flex:1}
-  table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;}
-  th,td{padding:7px 9px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap;}
-  th{position:sticky;top:0;background:var(--panel);text-align:right;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;z-index:1;font-weight:700;}
-  th:first-child,td:first-child{text-align:left;}
-  .tbl-scroll{max-height:460px;overflow:auto;border:1px solid var(--line);border-radius:9px;background:var(--panel);}
-  tr.picked td{background:#eaf3ef;}
-  .tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:20px;background:#eef;color:var(--accent);font-family:var(--sans);font-weight:700;letter-spacing:.03em;}
-  .tag.win{background:#e7f2ec;color:var(--accent);}
-  .tag.real{background:#fbeee0;color:var(--accent2);}
-  details{margin-top:14px;border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:0 14px;}
-  summary{cursor:pointer;font-weight:600;padding:12px 0;font-size:13px;list-style:none;display:flex;align-items:center;gap:8px;}
-  summary::-webkit-details-marker{display:none}
-  summary::before{content:"▸";color:var(--accent);transition:transform .15s}
-  details[open] summary::before{transform:rotate(90deg)}
-  details .body{padding:0 0 14px}
-  .num-pill{display:inline-block;font-family:var(--mono);font-size:12px;padding:3px 8px;margin:3px;border-radius:6px;background:#fff;border:1px solid var(--line);}
-  .num-pill.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;}
-  .empty{padding:60px 20px;text-align:center;color:var(--muted);}
-  .empty .big{font-size:40px;opacity:.35;margin-bottom:8px}
-  textarea{width:100%;min-height:70px;padding:9px;border:1px solid var(--line);border-radius:7px;font-family:var(--mono);font-size:12px;background:#fff;resize:vertical;}
-  .seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;margin-bottom:12px;}
-  .seg button{flex:1;padding:8px;background:#fff;border:none;border-radius:0;font-size:12px;color:var(--muted);}
-  .seg button.active{background:var(--accent);color:#fff;}
-  .mini{font-size:11px;color:var(--muted);margin:10px 0 2px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
-  code.inline{background:var(--grid);padding:1px 5px;border-radius:4px;font-size:12px;}
+:root{
+  --ink:#12181f;--paper:#f6f4ee;--panel:#fffdf8;--line:#d8d2c4;
+  --muted:#6b7280;--accent:#1f5f4f;--accent2:#b45309;--hot:#9a2b2b;
+  --grid:#eceae2;
+  --mono:"SF Mono",ui-monospace,"Roboto Mono",Menlo,Consolas,monospace;
+  --sans:"Inter",-apple-system,BlinkMacSystemFont,"Segoe UI","Malgun Gothic",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.5;}
+
+/* ── TABS ── */
+.tabs-wrap{background:var(--panel);border-bottom:2px solid var(--line);position:sticky;top:0;z-index:100;}
+.tabs{display:flex;max-width:1280px;margin:0 auto;padding:0 20px;}
+.tab-btn{padding:13px 22px;border:none;background:none;font-size:13px;font-weight:700;color:var(--muted);cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;font-family:var(--sans);}
+.tab-btn.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* ── LAYOUT ── */
+.wrap{max-width:1280px;margin:0 auto;padding:24px 20px 80px;}
+.page-header{margin-bottom:20px;}
+.page-header h1{font-size:20px;letter-spacing:-.02em;margin-bottom:4px;}
+.page-header p{color:var(--muted);font-size:13px;}
+.layout{display:grid;grid-template-columns:320px 1fr;gap:20px;}
+@media(max-width:900px){.layout{grid-template-columns:1fr}}
+
+/* ── CARD ── */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:14px;}
+.card:last-child{margin-bottom:0}
+.card h2{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--accent);margin-bottom:14px;font-weight:700;}
+
+/* ── FORM ── */
+label{display:block;font-size:12px;color:var(--muted);margin:12px 0 4px;font-weight:600;}
+label:first-of-type{margin-top:0}
+input[type=number],input[type=text]{width:100%;padding:9px 10px;border:1px solid var(--line);border-radius:7px;font-family:var(--mono);font-size:13px;background:#fff;}
+input:focus{outline:2px solid var(--accent);outline-offset:-1px;border-color:transparent;}
+textarea{width:100%;padding:9px;border:1px solid var(--line);border-radius:7px;font-family:var(--mono);font-size:12px;background:#fff;resize:vertical;}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.hint{font-size:11px;color:var(--muted);margin-top:3px;line-height:1.4;}
+
+/* ── BUTTONS ── */
+button{cursor:pointer;font-family:var(--sans);font-weight:600;border-radius:7px;border:1px solid transparent;}
+.btn-run{width:100%;margin-top:16px;padding:11px;background:var(--accent);color:#fff;font-size:14px;border:none;}
+.btn-run:hover{background:#174a3d}
+.btn-sub{padding:7px 12px;font-size:12px;background:#fff;border:1px solid var(--line);color:var(--ink);}
+.btn-sub:hover{background:var(--grid)}
+.btn-full{width:100%;margin-top:8px;}
+.btn-danger{color:var(--hot);border-color:#e3c9c9;}
+.btn-predict{padding:7px 14px;font-size:12px;background:#4f46e5;color:#fff;border:none;border-radius:7px;}
+.btn-predict:hover{background:#4338ca}
+
+/* ── SEGMENT ── */
+.seg{display:flex;border:1px solid var(--line);border-radius:7px;overflow:hidden;margin-bottom:0;}
+.seg button{flex:1;padding:7px 4px;background:#fff;border:none;border-radius:0;font-size:12px;color:var(--muted);font-family:var(--sans);font-weight:600;}
+.seg button.active{background:var(--accent);color:#fff;}
+
+/* ── STAT GRID ── */
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px;}
+@media(max-width:700px){.stat-grid{grid-template-columns:repeat(2,1fr)}}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:9px;padding:11px 13px;}
+.stat .k{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;}
+.stat .v{font-family:var(--mono);font-size:16px;font-weight:700;margin-top:3px;}
+.stat .v.sm{font-size:13px}
+
+/* ── TABLE ── */
+.tbl-scroll{overflow:auto;border:1px solid var(--line);border-radius:9px;background:var(--panel);}
+table{width:100%;border-collapse:collapse;font-family:var(--mono);font-size:12.5px;}
+th,td{padding:6px 9px;text-align:right;border-bottom:1px solid var(--grid);white-space:nowrap;}
+th{position:sticky;top:0;background:var(--panel);font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;z-index:1;font-weight:700;}
+th:first-child,td:first-child{text-align:left;}
+tr.hi td{background:#eaf3ef;font-weight:700;}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+.sp{flex:1}
+
+/* ── ANALYSIS LAYOUT ── */
+.analysis-body{display:grid;grid-template-columns:1fr 220px;gap:16px;align-items:start;}
+@media(max-width:800px){.analysis-body{grid-template-columns:1fr}}
+
+.chart-box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:16px;}
+.chart-header{display:flex;align-items:center;gap:8px;margin-bottom:12px;flex-wrap:wrap;}
+.chart-label{font-size:11px;text-transform:uppercase;color:var(--accent);font-weight:700;letter-spacing:.06em;}
+.legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10.5px;color:var(--muted);margin-top:8px;}
+.leg{display:flex;align-items:center;gap:5px;}
+.leg-line{width:18px;height:0;border-top:2.5px solid;}
+.leg-line.dashed{border-top-style:dashed;}
+
+.dist-box{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:14px;}
+.dist-head{display:flex;align-items:center;gap:6px;margin-bottom:10px;}
+.dist-title{font-size:11px;text-transform:uppercase;color:var(--accent);font-weight:700;letter-spacing:.06em;}
+
+/* ── PREDICTION CARD ── */
+.predict-card{background:var(--panel);border:2px solid #4f46e5;border-radius:10px;padding:14px;margin-top:14px;}
+.predict-label{font-size:10px;text-transform:uppercase;color:#4f46e5;font-weight:700;letter-spacing:.08em;margin-bottom:8px;}
+.predict-rate{font-family:var(--mono);font-size:26px;font-weight:800;color:#4f46e5;}
+.predict-won{font-size:13px;color:var(--muted);margin-top:2px;font-family:var(--mono);}
+.predict-meta{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.7;border-top:1px solid var(--line);padding-top:8px;}
+
+/* ── EMPTY ── */
+.empty{padding:60px 20px;text-align:center;color:var(--muted);}
+.empty .big{font-size:40px;opacity:.3;margin-bottom:8px;}
+
+details{border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:0 14px;}
+summary{cursor:pointer;font-weight:600;padding:11px 0;font-size:13px;list-style:none;display:flex;align-items:center;gap:8px;}
+summary::-webkit-details-marker{display:none}
+summary::before{content:"▸";color:var(--accent);transition:transform .15s}
+details[open] summary::before{transform:rotate(90deg)}
+details .body{padding:0 0 14px}
+.num-pill{display:inline-block;font-family:var(--mono);font-size:12px;padding:3px 8px;margin:3px;border-radius:6px;background:#fff;border:1px solid var(--line);}
+.num-pill.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600;}
+code.inline{background:var(--grid);padding:1px 5px;border-radius:4px;font-size:12px;}
+.tag{display:inline-block;font-size:10px;padding:1px 6px;border-radius:20px;background:#e7f2ec;color:var(--accent);font-family:var(--sans);font-weight:700;}
 </style>
 </head>
 <body>
-<div class="wrap">
-  <header>
-    <h1>낙찰 가격 도출 시뮬레이터</h1>
-    <p>복수예비가격 15개 추첨 → 4개 평균 → 기준가격 산출 → 최저 입찰 낙찰. 검증용 시뮬레이션 도구.</p>
-  </header>
 
+<!-- ── TABS ── -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <button class="tab-btn active" data-tab="sim">📊 시뮬레이션</button>
+    <button class="tab-btn" data-tab="analysis">📈 분석 &amp; 예측</button>
+  </div>
+</div>
+
+<div class="wrap">
+
+<!-- ══════════════════════════════════════
+     TAB 1: 시뮬레이션
+════════════════════════════════════════ -->
+<div id="tab-sim" class="tab-panel active">
+  <div class="page-header">
+    <h1>낙찰 가격 도출 시뮬레이터</h1>
+    <p>복수예비가격 15개 추첨 → 4개 평균 → 기준가격 산출 → 최저 입찰 낙찰</p>
+  </div>
   <div class="layout">
-    <!-- LEFT: controls -->
     <div>
       <div class="card">
         <h2>입력값</h2>
-
         <label>기본금액 (원)</label>
         <input type="text" id="base" value="10,000,000" inputmode="numeric">
         <div class="hint">낙찰 가격 산출의 기준이 되는 금액.</div>
-
         <label>산출 범위 (%)</label>
         <div class="row">
           <input type="number" id="lo" value="98" step="0.1">
           <input type="number" id="hi" value="102" step="0.1">
         </div>
-        <div class="hint">기본 98 ~ 102. 예: 97~103, 98.5~101.5 등 자유 설정.</div>
-
+        <div class="hint">기본 98 ~ 102.</div>
         <div class="row">
-          <div>
-            <label>예비가격 개수</label>
-            <input type="number" id="poolN" value="15" min="2">
-          </div>
-          <div>
-            <label>추첨 개수</label>
-            <input type="number" id="pickN" value="4" min="1">
-          </div>
+          <div><label>예비가격 개수</label><input type="number" id="poolN" value="15" min="2"></div>
+          <div><label>추첨 개수</label><input type="number" id="pickN" value="4" min="1"></div>
         </div>
         <div class="hint">국가계약 기본은 15개 중 4개.</div>
-
-        <label>시행 횟수 (한 번에 뽑을 데이터 수)</label>
+        <label>시행 횟수</label>
         <input type="number" id="trials" value="1" min="1" max="100000">
-        <div class="hint">여러 차수를 한 번에 생성해 통계로 볼 수 있음.</div>
-
+        <div class="hint">한 번에 생성할 차수 수.</div>
         <label>소수점 자리 (예비가격)</label>
         <input type="number" id="dp" value="5" min="0" max="8">
-
         <button class="btn-run" id="run">시뮬레이션 실행</button>
       </div>
-
-      <div class="card" style="margin-top:16px">
+      <div class="card">
         <h2>실제 데이터 반영</h2>
         <div class="seg" id="realMode">
           <button data-m="off" class="active">미사용</button>
           <button data-m="rate">낙찰율(%)</button>
           <button data-m="price">낙찰가(원)</button>
         </div>
-        <div id="realBox" style="display:none">
+        <div id="realBox" style="display:none;margin-top:12px">
           <div class="hint" id="realHint"></div>
-          <textarea id="realData" placeholder="한 줄에 하나씩 입력"></textarea>
-          <div class="hint">실제 차수의 <strong>기준가격 낙찰율</strong> 또는 <strong>낙찰가</strong>를 붙여넣으면, 시뮬레이션 분포와 겹쳐서 비교합니다.</div>
+          <textarea id="realData" placeholder="한 줄에 하나씩 입력" style="min-height:70px;margin-top:6px"></textarea>
+          <div class="hint">시뮬레이션 분포와 겹쳐서 비교합니다.</div>
         </div>
       </div>
     </div>
 
-    <!-- RIGHT: results -->
     <div>
-      <div id="stats" class="stat-grid" style="display:none"></div>
-
-      <div class="toolbar" id="viewToolbar" style="display:none">
+      <div id="s-stats" class="stat-grid" style="display:none"></div>
+      <div class="toolbar" id="s-toolbar" style="display:none">
         <div class="seg" style="margin:0;max-width:260px" id="viewMode">
           <button data-v="each" class="active">개별 차수</button>
           <button data-v="merged">합쳐 보기</button>
@@ -141,194 +193,479 @@
         <button class="btn-sub" id="exportCsv">CSV 내보내기</button>
         <button class="btn-sub btn-danger" id="clearAll">초기화</button>
       </div>
-
-      <div id="output">
+      <div id="s-output">
         <div class="card"><div class="empty"><div class="big">◷</div>왼쪽에서 값을 설정하고 <strong>시뮬레이션 실행</strong>을 눌러주세요.</div></div>
       </div>
     </div>
   </div>
-</div>
+</div><!-- /tab-sim -->
+
+<!-- ══════════════════════════════════════
+     TAB 2: 분석 & 예측
+════════════════════════════════════════ -->
+<div id="tab-analysis" class="tab-panel">
+  <div class="page-header">
+    <h1>낙찰률 분석 &amp; 예측</h1>
+    <p>과거 낙찰 데이터 입력 → 추이 시각화 → 분포 분석 → 다음 낙찰률 예측</p>
+  </div>
+  <div class="layout">
+    <!-- LEFT: input -->
+    <div>
+      <div class="card">
+        <h2>데이터 입력</h2>
+        <label>기본금액 (원)</label>
+        <input type="text" id="a-base" value="10,000,000" inputmode="numeric">
+
+        <label>데이터 형식</label>
+        <div class="seg" id="a-inputMode">
+          <button data-im="rate" class="active">낙찰률 (%)</button>
+          <button data-im="price">낙찰가 (원)</button>
+        </div>
+
+        <label>과거 낙찰 데이터</label>
+        <textarea id="a-rates" rows="10" placeholder="줄바꿈 또는 쉼표로 구분&#10;&#10;예:&#10;100.34257&#10;99.28169&#10;100.93347&#10;99.18503&#10;..."></textarea>
+        <div class="hint">기준가격율(%) 또는 낙찰가를 차수 순서대로 입력</div>
+
+        <label>날짜 레이블 (선택)</label>
+        <textarea id="a-dates" rows="4" placeholder="26.04.30&#10;26.05.08&#10;26.05.12&#10;..."></textarea>
+        <div class="hint">입력하면 차트 X축에 표시됩니다.</div>
+
+        <button class="btn-run" id="a-run">분석 실행</button>
+        <button class="btn-sub btn-full btn-danger" id="a-clear">초기화</button>
+      </div>
+
+      <div class="card">
+        <h2>예측 설정</h2>
+        <label>이동평균 기간 (최근 N건)</label>
+        <input type="number" id="a-maN" value="5" min="2" max="30">
+        <div class="hint">최근 N건 가중평균으로 다음 낙찰률 예측.</div>
+
+        <label>반진동 보정</label>
+        <div class="seg" id="a-revert">
+          <button data-rv="none" class="active">없음</button>
+          <button data-rv="soft">약하게</button>
+          <button data-rv="strong">강하게</button>
+        </div>
+        <div class="hint">최근 높으면 낮게, 낮으면 높게 보정.</div>
+      </div>
+    </div>
+
+    <!-- RIGHT: results -->
+    <div>
+      <div id="a-empty" class="card">
+        <div class="empty"><div class="big">📈</div>왼쪽에 과거 낙찰률을 입력하고 <strong>분석 실행</strong>을 눌러주세요.</div>
+      </div>
+
+      <div id="a-results" style="display:none">
+        <!-- stats -->
+        <div id="a-stat-grid" class="stat-grid"></div>
+
+        <!-- chart + dist table -->
+        <div class="analysis-body">
+          <div class="chart-box">
+            <div class="chart-header">
+              <span class="chart-label">낙찰률 추이</span>
+              <span id="a-count-lbl" style="font-size:11px;color:var(--muted)"></span>
+              <span class="sp"></span>
+              <button class="btn-predict" id="a-predict-btn">다음지점예측 +</button>
+              <button class="btn-sub btn-danger" id="a-predict-del" style="display:none">예측삭제</button>
+            </div>
+            <canvas id="a-chart"></canvas>
+            <div class="legend">
+              <div class="leg"><div class="leg-line" style="border-color:#ef4444"></div>낙찰률</div>
+              <div class="leg"><div class="leg-line" style="border-color:#22c55e"></div>최고율</div>
+              <div class="leg"><div class="leg-line dashed" style="border-color:#f59e0b"></div>평균율</div>
+              <div class="leg"><div class="leg-line" style="border-color:#3b82f6"></div>최저율</div>
+              <div class="leg"><div class="leg-line dashed" style="border-color:#7c3aed"></div>예측</div>
+            </div>
+          </div>
+
+          <div>
+            <div class="dist-box">
+              <div class="dist-head">
+                <span class="dist-title">분포</span>
+                <span class="sp"></span>
+                <div class="seg" id="a-interval" style="margin:0;font-size:11px">
+                  <button data-i="0.5">0.5</button>
+                  <button data-i="0.25" class="active">0.25</button>
+                  <button data-i="0.1">0.1</button>
+                  <button data-i="0.01">0.01</button>
+                </div>
+              </div>
+              <div class="tbl-scroll" style="max-height:340px">
+                <table id="a-dist-tbl">
+                  <tr><th>범위</th><th>수</th><th>%</th></tr>
+                </table>
+              </div>
+            </div>
+
+            <div id="a-predict-card" class="predict-card" style="display:none">
+              <div class="predict-label">🎯 다음 낙찰률 예측</div>
+              <div id="a-pred-rate" class="predict-rate">—</div>
+              <div id="a-pred-won" class="predict-won"></div>
+              <div id="a-pred-meta" class="predict-meta"></div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:14px">
+          <button class="btn-sub" id="a-export">CSV 내보내기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div><!-- /tab-analysis -->
+
+</div><!-- /wrap -->
 
 <script>
+Chart.register(ChartDataLabels);
+
+/* ────────────────────────────────────────
+   TABS
+──────────────────────────────────────── */
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const t = btn.dataset.tab;
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b === btn));
+    document.querySelectorAll('.tab-panel').forEach(p => p.classList.toggle('active', p.id === 'tab-' + t));
+  });
+});
+
+/* ────────────────────────────────────────
+   SIMULATION (Tab 1)
+──────────────────────────────────────── */
 const $=id=>document.getElementById(id);
 const fmt=(n,d=0)=>n.toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d});
 const won=n=>Math.round(n).toLocaleString('ko-KR')+'원';
 
-let runs=[];
-let realMode='off';
-let viewMode='each';
+let sRuns=[], sRealMode='off', sViewMode='each';
 
 $('base').addEventListener('input',e=>{
   const v=e.target.value.replace(/[^\d]/g,'');
   e.target.value=v?Number(v).toLocaleString('ko-KR'):'';
 });
-
 $('realMode').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b)return;
-  realMode=b.dataset.m;
+  const b=e.target.closest('button');if(!b)return;
+  sRealMode=b.dataset.m;
   [...$('realMode').children].forEach(x=>x.classList.toggle('active',x===b));
-  $('realBox').style.display = realMode==='off'?'none':'block';
-  $('realHint').textContent = realMode==='rate'
-    ? '기준가격 = 기본금액 × (낙찰율/100). 예: 99.53'
-    : realMode==='price'
-    ? '실제 기준가격(원). 예: 9,953,000' : '';
+  $('realBox').style.display=sRealMode==='off'?'none':'block';
+  $('realHint').textContent=sRealMode==='rate'?'기준가격 = 기본금액 × (낙찰율/100). 예: 99.53':sRealMode==='price'?'실제 기준가격(원). 예: 9,953,000':'';
 });
 $('viewMode').addEventListener('click',e=>{
-  const b=e.target.closest('button'); if(!b)return;
-  viewMode=b.dataset.v;
+  const b=e.target.closest('button');if(!b)return;
+  sViewMode=b.dataset.v;
   [...$('viewMode').children].forEach(x=>x.classList.toggle('active',x===b));
-  render();
+  sRender();
 });
 
 function comb(n,r){let c=1;for(let i=0;i<r;i++)c=c*(n-i)/(i+1);return Math.round(c);}
-
 function samplePick(n,r){
   const idx=[...Array(n).keys()];
   for(let i=idx.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[idx[i],idx[j]]=[idx[j],idx[i]];}
   return idx.slice(0,r).sort((a,b)=>a-b);
 }
-
-function runOnce(cfg){
+function sRunOnce(cfg){
   const {base,lo,hi,poolN,pickN,dp}=cfg;
   const f=Math.pow(10,dp);
-  const pool=Array.from({length:poolN},()=>{
-    const r=lo+Math.random()*(hi-lo);
-    return Math.round(r*f)/f;
-  });
+  const pool=Array.from({length:poolN},()=>Math.round((lo+Math.random()*(hi-lo))*f)/f);
   const picks=samplePick(poolN,pickN);
   const avg=picks.reduce((s,i)=>s+pool[i],0)/pickN;
-  const basePrice=base*avg/100;
-  return {pool,picks,avg,basePrice};
+  return {pool,picks,avg,basePrice:base*avg/100};
 }
 
 $('run').addEventListener('click',()=>{
   const base=Number($('base').value.replace(/[^\d]/g,''));
-  const lo=parseFloat($('lo').value), hi=parseFloat($('hi').value);
-  const poolN=parseInt($('poolN').value), pickN=parseInt($('pickN').value);
+  const lo=parseFloat($('lo').value),hi=parseFloat($('hi').value);
+  const poolN=parseInt($('poolN').value),pickN=parseInt($('pickN').value);
   const trials=Math.min(parseInt($('trials').value)||1,100000);
   const dp=Math.max(0,Math.min(8,parseInt($('dp').value)||5));
   if(!base){alert('기본금액을 입력하세요.');return;}
   if(hi<=lo){alert('산출 범위 상한이 하한보다 커야 합니다.');return;}
   if(pickN>poolN){alert('추첨 개수는 예비가격 개수 이하여야 합니다.');return;}
-
   const cfg={base,lo,hi,poolN,pickN,dp,trials};
   const batch=[];
-  for(let t=0;t<trials;t++) batch.push(runOnce(cfg));
-  runs.push({cfg,batch,ts:Date.now()});
-  render();
+  for(let t=0;t<trials;t++)batch.push(sRunOnce(cfg));
+  sRuns.push({cfg,batch,ts:Date.now()});
+  sRender();
 });
 
-$('clearAll').addEventListener('click',()=>{if(confirm('모든 시뮬레이션 결과를 지웁니다.')){runs=[];render();}});
+$('clearAll').addEventListener('click',()=>{if(confirm('모든 시뮬레이션 결과를 지웁니다.')){sRuns=[];sRender();}});
 
-function realBasePrices(base){
-  if(realMode==='off') return [];
+function sRealPrices(base){
+  if(sRealMode==='off')return[];
   const raw=$('realData').value.split(/[\n,]+/).map(s=>s.replace(/[^\d.]/g,'')).filter(Boolean).map(Number);
-  if(realMode==='rate') return raw.map(r=>base*r/100);
-  return raw;
+  return sRealMode==='rate'?raw.map(r=>base*r/100):raw;
 }
+function sAllPrices(){return sRuns.flatMap(r=>r.batch.map(b=>b.basePrice));}
 
-function allBasePrices(){
-  return runs.flatMap(r=>r.batch.map(b=>b.basePrice));
-}
-
-function render(){
-  if(runs.length===0){
-    $('stats').style.display='none';
-    $('viewToolbar').style.display='none';
-    $('output').innerHTML='<div class="card"><div class="empty"><div class="big">◷</div>왼쪽에서 값을 설정하고 <strong>시뮬레이션 실행</strong>을 눌러주세요.</div></div>';
+function sRender(){
+  if(!sRuns.length){
+    $('s-stats').style.display='none';$('s-toolbar').style.display='none';
+    $('s-output').innerHTML='<div class="card"><div class="empty"><div class="big">◷</div>왼쪽에서 값을 설정하고 <strong>시뮬레이션 실행</strong>을 눌러주세요.</div></div>';
     return;
   }
-  $('stats').style.display='grid';
-  $('viewToolbar').style.display='flex';
-
-  const prices=allBasePrices();
-  const base=runs[runs.length-1].cfg.base;
+  $('s-stats').style.display='grid';$('s-toolbar').style.display='flex';
+  const prices=sAllPrices();
+  const base=sRuns[sRuns.length-1].cfg.base;
   const mean=prices.reduce((a,b)=>a+b,0)/prices.length;
-  const min=Math.min(...prices), max=Math.max(...prices);
+  const min=Math.min(...prices),max=Math.max(...prices);
   const sd=Math.sqrt(prices.reduce((s,p)=>s+(p-mean)**2,0)/prices.length);
-  const cfg=runs[runs.length-1].cfg;
-
-  $('stats').innerHTML=`
+  const cfg=sRuns[sRuns.length-1].cfg;
+  $('s-stats').innerHTML=`
     <div class="stat"><div class="k">총 시행 수</div><div class="v">${fmt(prices.length)}</div></div>
-    <div class="stat"><div class="k">기준가격 평균</div><div class="v small">${won(mean)}</div></div>
-    <div class="stat"><div class="k">최솟값 / 최곳값</div><div class="v small">${won(min)} / ${won(max)}</div></div>
-    <div class="stat"><div class="k">표준편차 · 조합수</div><div class="v small">${won(sd)} · ${comb(cfg.poolN,cfg.pickN)}<span style="font-size:11px;color:var(--muted)"> (${cfg.poolN}C${cfg.pickN})</span></div></div>
+    <div class="stat"><div class="k">기준가격 평균</div><div class="v sm">${won(mean)}</div></div>
+    <div class="stat"><div class="k">최솟값 / 최곳값</div><div class="v sm">${won(min)}<br>${won(max)}</div></div>
+    <div class="stat"><div class="k">표준편차 · 조합수</div><div class="v sm">${won(sd)}<br>${comb(cfg.poolN,cfg.pickN)}</div></div>
   `;
-
-  const reals=realBasePrices(base);
+  const reals=sRealPrices(base);
   let realBlock='';
   if(reals.length){
     const rMean=reals.reduce((a,b)=>a+b,0)/reals.length;
     const diff=rMean-mean;
-    realBlock=`<details open><summary><span class="tag real">실제 데이터 비교</span> 실제 ${reals.length}건 vs 시뮬</summary><div class="body">
+    realBlock=`<details open style="margin-top:12px"><summary><span class="tag">실제 데이터 비교</span> 실제 ${reals.length}건 vs 시뮬</summary><div class="body">
       <table><tr><th>구분</th><th>건수</th><th>평균 기준가격</th></tr>
       <tr><td>시뮬레이션</td><td>${fmt(prices.length)}</td><td>${won(mean)}</td></tr>
       <tr><td>실제</td><td>${reals.length}</td><td>${won(rMean)}</td></tr>
-      <tr class="picked"><td>차이 (실제−시뮬)</td><td>—</td><td>${(diff>=0?'+':'')}${won(diff)}</td></tr>
-      </table>
-      <div class="hint" style="margin-top:8px">시뮬 분포 대비 실제 기준가격이 어디에 위치하는지 비교합니다. 실제 평균이 시뮬 평균과 크게 다르면 실제 추첨이 균등하지 않거나 범위 설정이 다를 수 있습니다.</div>
-    </div></details>`;
+      <tr class="hi"><td>차이 (실제−시뮬)</td><td>—</td><td>${(diff>=0?'+':'')}${won(diff)}</td></tr>
+      </table></div></details>`;
   }
-
-  if(viewMode==='merged'){
-    const bins=20;
-    const bw=(max-min)/bins||1;
+  if(sViewMode==='merged'){
+    const bins=20,bw=(max-min)/bins||1;
     const hist=Array(bins).fill(0);
-    prices.forEach(p=>{let i=Math.min(bins-1,Math.floor((p-min)/bw));hist[i]++;});
+    prices.forEach(p=>{hist[Math.min(bins-1,Math.floor((p-min)/bw))]++;});
     const hmax=Math.max(...hist);
     const rHist=Array(bins).fill(0);
-    reals.forEach(p=>{if(p>=min&&p<=max){let i=Math.min(bins-1,Math.floor((p-min)/bw));rHist[i]++;}});
+    reals.forEach(p=>{if(p>=min&&p<=max)rHist[Math.min(bins-1,Math.floor((p-min)/bw))]++;});
     let rows='';
     for(let i=0;i<bins;i++){
-      const lo=min+i*bw, hi=lo+bw;
-      const w=(hist[i]/hmax*100)||0;
-      const rMark=rHist[i]?`<span class="tag real" style="margin-left:6px">실제 ${rHist[i]}</span>`:'';
-      rows+=`<tr><td>${won(lo)} ~ ${won(hi)}</td>
-        <td style="text-align:left;width:55%"><div style="display:inline-block;height:12px;width:${w}%;min-width:2px;background:var(--accent);border-radius:3px"></div> ${hist[i]}${rMark}</td></tr>`;
+      const lo=min+i*bw,hi=lo+bw,w=(hist[i]/hmax*100)||0;
+      const rMark=rHist[i]?`<span class="tag" style="margin-left:6px">실제 ${rHist[i]}</span>`:'';
+      rows+=`<tr><td>${won(lo)} ~ ${won(hi)}</td><td style="text-align:left;width:55%"><div style="display:inline-block;height:12px;width:${w}%;min-width:2px;background:var(--accent);border-radius:3px"></div> ${hist[i]}${rMark}</td></tr>`;
     }
-    $('output').innerHTML=`<div class="card"><h2>합쳐 보기 · 기준가격 분포</h2>
-      <div class="tbl-scroll" style="max-height:none"><table><tr><th>기준가격 구간</th><th style="text-align:left">빈도</th></tr>${rows}</table></div>
-      </div>${realBlock}`;
+    $('s-output').innerHTML=`<div class="card"><h2>합쳐 보기 · 기준가격 분포</h2>
+      <div class="tbl-scroll" style="max-height:none"><table><tr><th>기준가격 구간</th><th style="text-align:left">빈도</th></tr>${rows}</table></div></div>${realBlock}`;
     return;
   }
-
-  const last=runs[runs.length-1];
-  const showN=Math.min(last.batch.length,1000);
+  const last=sRuns[sRuns.length-1],showN=Math.min(last.batch.length,1000);
   let rows='';
   last.batch.slice(0,showN).forEach((b,i)=>{
-    const picksStr=b.picks.map(p=>`#${p+1}`).join(' ');
-    rows+=`<tr><td>${i+1}</td><td>${b.avg.toFixed(cfg.dp)}</td><td>${won(b.basePrice)}</td><td style="text-align:left;color:var(--muted)">${picksStr}</td></tr>`;
+    rows+=`<tr><td>${i+1}</td><td>${b.avg.toFixed(cfg.dp)}</td><td>${won(b.basePrice)}</td><td style="text-align:left;color:var(--muted)">${b.picks.map(p=>`#${p+1}`).join(' ')}</td></tr>`;
   });
-
   const first=last.batch[0];
-  let poolPills=first.pool.map((v,i)=>`<span class="num-pill ${first.picks.includes(i)?'on':''}">#${i+1} ${v.toFixed(cfg.dp)}</span>`).join('');
-
-  $('output').innerHTML=`
+  const poolPills=first.pool.map((v,i)=>`<span class="num-pill ${first.picks.includes(i)?'on':''}">#${i+1} ${v.toFixed(cfg.dp)}</span>`).join('');
+  $('s-output').innerHTML=`
     <div class="card">
       <h2>차수별 기준가격 · 최근 시행 (${fmt(showN)}${last.batch.length>showN?' / '+fmt(last.batch.length):''}건)</h2>
       <div class="tbl-scroll"><table>
         <tr><th>차수</th><th>추첨 평균(%)</th><th>기준가격</th><th style="text-align:left">추첨 번호</th></tr>
         ${rows}
       </table></div>
-      <details style="margin-top:14px"><summary>1차수 예비가격 ${cfg.poolN}개 상세 <span class="tag win">추첨 ${cfg.pickN}개 강조</span></summary>
+      <details style="margin-top:12px"><summary>1차수 예비가격 ${cfg.poolN}개 상세 <span class="tag">추첨 ${cfg.pickN}개 강조</span></summary>
         <div class="body">${poolPills}
         <div class="hint" style="margin-top:8px">강조된 ${cfg.pickN}개의 평균 = <code class="inline">${first.avg.toFixed(cfg.dp)}%</code> → 기준가격 <code class="inline">${won(first.basePrice)}</code></div></div>
       </details>
-      <div class="hint" style="margin-top:12px"><strong>낙찰 규칙:</strong> 기준가격보다 1원이라도 낮은 투찰 중 <strong>가장 낮은 금액</strong>이 낙찰. 여기서는 차수별 기준가격을 산출합니다.</div>
-    </div>
-    ${realBlock}
-  `;
+      <div class="hint" style="margin-top:10px"><strong>낙찰 규칙:</strong> 기준가격보다 1원이라도 낮은 투찰 중 가장 낮은 금액이 낙찰.</div>
+    </div>${realBlock}`;
 }
 
 $('exportCsv').addEventListener('click',()=>{
-  if(!runs.length)return;
+  if(!sRuns.length)return;
   let csv='시행배치,차수,추첨평균(%),기준가격(원),추첨번호\n';
-  runs.forEach((r,ri)=>r.batch.forEach((b,bi)=>{
+  sRuns.forEach((r,ri)=>r.batch.forEach((b,bi)=>{
     csv+=`${ri+1},${bi+1},${b.avg.toFixed(r.cfg.dp)},${Math.round(b.basePrice)},"${b.picks.map(p=>p+1).join(' ')}"\n`;
   }));
   const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a');
-  a.href=URL.createObjectURL(blob);a.download='nakchal_simulation.csv';a.click();
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nakchal_simulation.csv';a.click();
+});
+
+/* ────────────────────────────────────────
+   ANALYSIS (Tab 2)
+──────────────────────────────────────── */
+let aRates=[], aDates=[], aBase=0, aInputMode='rate', aRevert='none', aInterval=0.25;
+let aChart=null, aPredicted=false;
+
+$('a-base').addEventListener('input',e=>{
+  const v=e.target.value.replace(/[^\d]/g,'');
+  e.target.value=v?Number(v).toLocaleString('ko-KR'):'';
+});
+$('a-inputMode').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  aInputMode=b.dataset.im;
+  [...$('a-inputMode').children].forEach(x=>x.classList.toggle('active',x===b));
+});
+$('a-revert').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  aRevert=b.dataset.rv;
+  [...$('a-revert').children].forEach(x=>x.classList.toggle('active',x===b));
+});
+$('a-interval').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  aInterval=parseFloat(b.dataset.i);
+  [...$('a-interval').children].forEach(x=>x.classList.toggle('active',x===b));
+  if(aRates.length)aDist();
+});
+
+$('a-run').addEventListener('click',()=>{
+  aBase=Number($('a-base').value.replace(/[^\d]/g,''));
+  const rawR=$('a-rates').value.split(/[\n,\s，]+/).map(s=>s.replace(/[^\d.]/g,'')).filter(Boolean).map(Number).filter(n=>n>0);
+  if(!rawR.length){alert('낙찰 데이터를 입력하세요.');return;}
+  aRates=aInputMode==='price'&&aBase?rawR.map(p=>p/aBase*100):rawR;
+  const rawD=$('a-dates').value.split(/[\n,]+/).map(s=>s.trim()).filter(Boolean);
+  aDates=rawD.length?rawD:aRates.map((_,i)=>`${i+1}차`);
+  aPredicted=false;
+  $('a-predict-del').style.display='none';
+  $('a-predict-card').style.display='none';
+  aShowResults();
+});
+
+$('a-clear').addEventListener('click',()=>{
+  aRates=[];aDates=[];aPredicted=false;
+  $('a-empty').style.display='';$('a-results').style.display='none';
+  $('a-predict-card').style.display='none';$('a-predict-del').style.display='none';
+  if(aChart){aChart.destroy();aChart=null;}
+});
+
+$('a-predict-btn').addEventListener('click',()=>{
+  if(!aRates.length)return;
+  aPredicted=true;
+  aDrawChart();
+  aShowPredict();
+  $('a-predict-card').style.display='';
+  $('a-predict-del').style.display='';
+});
+$('a-predict-del').addEventListener('click',()=>{
+  aPredicted=false;
+  $('a-predict-card').style.display='none';$('a-predict-del').style.display='none';
+  aDrawChart();
+});
+
+function aCalcPredict(){
+  const n=Math.min(parseInt($('a-maN').value)||5,aRates.length);
+  const recent=aRates.slice(-n);
+  const globalMean=aRates.reduce((a,b)=>a+b,0)/aRates.length;
+  let wSum=0,wTotal=0;
+  recent.forEach((v,i)=>{const w=i+1;wSum+=v*w;wTotal+=w;});
+  let pred=wSum/wTotal;
+  const last=aRates[aRates.length-1];
+  if(aRevert==='soft')  pred=pred-(last-globalMean)*0.3;
+  if(aRevert==='strong')pred=pred-(last-globalMean)*0.6;
+  return {pred:Math.round(pred*100000)/100000,globalMean,n};
+}
+
+function aShowResults(){
+  $('a-empty').style.display='none';$('a-results').style.display='';
+  const mean=aRates.reduce((a,b)=>a+b,0)/aRates.length;
+  const min=Math.min(...aRates),max=Math.max(...aRates);
+  const sd=Math.sqrt(aRates.reduce((s,v)=>s+(v-mean)**2,0)/aRates.length);
+  const wf=n=>aBase?Math.round(aBase*n/100).toLocaleString('ko-KR')+'원':'—';
+  $('a-stat-grid').innerHTML=`
+    <div class="stat"><div class="k">공고 건수</div><div class="v">${aRates.length}</div></div>
+    <div class="stat"><div class="k">평균 낙찰률</div><div class="v sm">${mean.toFixed(5)}%<br><span style="font-size:11px;color:var(--muted)">${wf(mean)}</span></div></div>
+    <div class="stat"><div class="k">최고 / 최저</div><div class="v sm">${max.toFixed(5)}<br>${min.toFixed(5)}</div></div>
+    <div class="stat"><div class="k">표준편차</div><div class="v sm">${sd.toFixed(5)}</div></div>
+  `;
+  $('a-count-lbl').textContent=`검색 공고 ${aRates.length}건`;
+  aDrawChart();
+  aDist();
+}
+
+function aDrawChart(){
+  const mean=aRates.reduce((a,b)=>a+b,0)/aRates.length;
+  const maxV=Math.max(...aRates),minV=Math.min(...aRates);
+  const labels=[...aDates];
+  const rateData=[...aRates.map(v=>Math.round(v*100000)/100000)];
+  const meanData=aRates.map(()=>Math.round(mean*100000)/100000);
+  const maxData=aRates.map(()=>Math.round(maxV*100000)/100000);
+  const minData=aRates.map(()=>Math.round(minV*100000)/100000);
+
+  const datasets=[
+    {label:'낙찰률',data:rateData,borderColor:'#ef4444',backgroundColor:'#ef4444',borderWidth:1.5,pointRadius:4,pointHoverRadius:6,tension:0.1,
+      datalabels:{display:true,color:'#12181f',font:{size:8.5,weight:'700'},anchor:'end',align:'top',offset:2,formatter:v=>v!=null?v.toFixed(5):''}},
+    {label:'최고율',data:maxData,borderColor:'#22c55e',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:0,datalabels:{display:false}},
+    {label:'평균율',data:meanData,borderColor:'#f59e0b',backgroundColor:'transparent',borderWidth:1.5,borderDash:[5,4],pointRadius:0,tension:0,datalabels:{display:false}},
+    {label:'최저율',data:minData,borderColor:'#3b82f6',backgroundColor:'transparent',borderWidth:1.5,pointRadius:0,tension:0,datalabels:{display:false}},
+  ];
+
+  if(aPredicted){
+    const {pred}=aCalcPredict();
+    labels.push('예측');
+    const predLine=[...new Array(aRates.length-1).fill(null),aRates[aRates.length-1],pred];
+    datasets.push({
+      label:'예측',data:predLine,borderColor:'#7c3aed',backgroundColor:'#7c3aed',borderWidth:2,borderDash:[6,4],
+      pointRadius:predLine.map((_,i)=>i===predLine.length-1?8:0),
+      pointStyle:predLine.map((_,i)=>i===predLine.length-1?'star':'circle'),
+      pointBackgroundColor:'#7c3aed',tension:0.1,spanGaps:false,
+      datalabels:{display:(ctx)=>ctx.dataIndex===predLine.length-1,color:'#7c3aed',font:{size:9,weight:'800'},anchor:'end',align:'top',offset:4,formatter:v=>v!=null?v.toFixed(5):''},
+    });
+    // also extend other ref lines
+    datasets[1].data.push(maxV);
+    datasets[2].data.push(mean);
+    datasets[3].data.push(minV);
+  }
+
+  if(aChart){aChart.data.labels=labels;aChart.data.datasets=datasets;aChart.update();return;}
+  const ctx=$('a-chart').getContext('2d');
+  aChart=new Chart(ctx,{
+    type:'line',
+    data:{labels,datasets},
+    options:{
+      responsive:true,
+      interaction:{mode:'index',intersect:false},
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{label:c=>c.parsed.y!=null?`${c.dataset.label}: ${c.parsed.y.toFixed(5)}%`:null}},
+        datalabels:{},
+      },
+      scales:{
+        x:{ticks:{font:{size:10},maxRotation:45},grid:{color:'#eceae2'}},
+        y:{ticks:{font:{size:10},callback:v=>v.toFixed(2)+'%'},grid:{color:'#eceae2'}},
+      },
+    },
+  });
+}
+
+function aDist(){
+  const intv=aInterval;
+  const min=Math.min(...aRates),max=Math.max(...aRates);
+  const lo=Math.floor(min/intv)*intv;
+  const hi=Math.ceil(max/intv)*intv;
+  const ranges=[];
+  for(let r=hi;r>lo-intv*0.5;r-=intv){
+    const top=Math.round(r*10000)/10000;
+    const bot=Math.round((r-intv)*10000)/10000;
+    ranges.push({top,bot,count:aRates.filter(v=>v>=bot&&v<top).length});
+  }
+  const maxCount=Math.max(...ranges.map(r=>r.count));
+  const total=aRates.length;
+  const dp=intv<0.1?2:2;
+  const rows=ranges.map(r=>{
+    const pct=total?(r.count/total*100).toFixed(2):0;
+    const isHi=r.count===maxCount&&r.count>0;
+    const bar=r.count?`<div style="display:inline-block;width:${Math.round(r.count/maxCount*50)}px;height:8px;background:var(--accent);border-radius:2px;margin-left:4px;vertical-align:middle"></div>`:'';
+    return `<tr${isHi?' class="hi"':''}><td>${r.top.toFixed(dp)}~${r.bot.toFixed(dp)}</td><td>${r.count}${bar}</td><td>${pct}%</td></tr>`;
+  }).join('');
+  $('a-dist-tbl').innerHTML=`<tr><th>범위</th><th>수</th><th>%</th></tr>${rows}`;
+}
+
+function aShowPredict(){
+  const {pred,globalMean,n}=aCalcPredict();
+  const wf=v=>aBase?`≒ ${Math.round(aBase*v/100).toLocaleString('ko-KR')}원`:'';
+  $('a-pred-rate').textContent=`${pred.toFixed(5)}%`;
+  $('a-pred-won').textContent=wf(pred);
+  $('a-pred-meta').innerHTML=
+    `최근 ${n}건 가중이동평균 기반<br>`+
+    `전체 평균: ${globalMean.toFixed(5)}%<br>`+
+    `반진동 보정: ${aRevert==='none'?'없음':aRevert==='soft'?'약하게':'강하게'}<br>`+
+    (aBase?`예측 기준가격: ${wf(pred)}`:'');
+}
+
+$('a-export').addEventListener('click',()=>{
+  if(!aRates.length)return;
+  let csv='차수,날짜,낙찰률(%)\n';
+  aRates.forEach((v,i)=>{csv+=`${i+1},${aDates[i]||''},${v}\n`;});
+  const blob=new Blob(['﻿'+csv],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='nakchal_analysis.csv';a.click();
 });
 </script>
 </body>
