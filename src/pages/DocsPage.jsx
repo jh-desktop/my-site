@@ -17,6 +17,14 @@ const DOCS = [
 
 const LINKS = [
   {
+    id: 'nakchal',
+    title: '낙찰 가격 시뮬레이터',
+    desc: '복수예비가격 15개 추첨 → 4개 평균 → 기준가격 산출. 국가계약 낙찰 검증 도구.',
+    url: '/nakchal_simulator.html',
+    icon: '🏛',
+    label: '열기 ↗',
+  },
+  {
     id: 'blog',
     title: '네이버 블로그',
     desc: '일상, 포커, 개발 이야기를 기록하는 블로그',
