@@ -216,6 +216,26 @@ tr.near-row td{background:#f0fdf4;}
       <div id="s-output">
         <div class="card"><div class="empty"><div class="big">◷</div>왼쪽에서 값을 설정하고 <strong>시뮬레이션 실행</strong>을 눌러주세요.</div></div>
       </div>
+      <div id="s-freq-section" style="display:none;margin-top:14px">
+        <div class="card">
+          <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+            <h2 style="margin:0">기준가격율 빈도 분석 (소수점 2자리)</h2>
+            <span id="s-freq-total" style="font-size:11px;color:var(--muted)"></span>
+            <span class="sp"></span>
+            <div class="seg" id="s-freq-sort" style="margin:0;font-size:11px">
+              <button data-fs="asc" class="active">↑ 오름차순</button>
+              <button data-fs="desc">↓ 내림차순</button>
+              <button data-fs="freq">빈도순</button>
+            </div>
+            <button id="s-to-calc" class="btn-predict" style="font-size:12px;white-space:nowrap">→ 투찰 계산기</button>
+          </div>
+          <div class="tbl-scroll" style="max-height:380px">
+            <table id="s-freq-tbl">
+              <tr><th>사정률 (%)</th><th>빈도</th><th>확률</th><th style="text-align:left">분포</th></tr>
+            </table>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </div><!-- /tab-sim -->
@@ -476,12 +496,15 @@ const $=id=>document.getElementById(id);
 const fmt=(n,d=0)=>n.toLocaleString('ko-KR',{minimumFractionDigits:d,maximumFractionDigits:d});
 const won=n=>Math.round(n).toLocaleString('ko-KR')+'원';
 
-let sRuns=[], sRealMode='off', sViewMode='each';
+let sRuns=[], sRealMode='off', sViewMode='each', sFreqData=[], sFreqSort='asc';
 
 $('base').addEventListener('input',e=>{
   const v=e.target.value.replace(/[^\d]/g,'');
   e.target.value=v?Number(v).toLocaleString('ko-KR'):'';
+  $('c-base').value=e.target.value;
 });
+$('lo').addEventListener('input',e=>{$('c-rlo').value=e.target.value;});
+$('hi').addEventListener('input',e=>{$('c-rhi').value=e.target.value;});
 $('realMode').addEventListener('click',e=>{
   const b=e.target.closest('button');if(!b)return;
   sRealMode=b.dataset.m;
@@ -525,6 +548,7 @@ $('run').addEventListener('click',()=>{
   for(let t=0;t<trials;t++)batch.push(sRunOnce(cfg));
   sRuns.push({cfg,batch,ts:Date.now()});
   sRender();
+  sRenderFreq();
 });
 
 $('clearAll').addEventListener('click',()=>{if(confirm('모든 시뮬레이션 결과를 지웁니다.')){sRuns=[];sRender();}});
@@ -540,6 +564,7 @@ function sRender(){
   if(!sRuns.length){
     $('s-stats').style.display='none';$('s-toolbar').style.display='none';
     $('s-output').innerHTML='<div class="card"><div class="empty"><div class="big">◷</div>왼쪽에서 값을 설정하고 <strong>시뮬레이션 실행</strong>을 눌러주세요.</div></div>';
+    $('s-freq-section').style.display='none';
     return;
   }
   $('s-stats').style.display='grid';$('s-toolbar').style.display='flex';
@@ -605,6 +630,50 @@ function sRender(){
       <div class="hint" style="margin-top:10px"><strong>낙찰 규칙:</strong> 기준가격보다 1원이라도 낮은 투찰 중 가장 낮은 금액이 낙찰.</div>
     </div>${realBlock}`;
 }
+
+function sRenderFreq(){
+  if(!sRuns.length){$('s-freq-section').style.display='none';return;}
+  const all=sRuns.flatMap(r=>r.batch);
+  const map={};
+  all.forEach(b=>{const k=(Math.round(b.avg*100)/100).toFixed(2);map[k]=(map[k]||0)+1;});
+  sFreqData=Object.entries(map).map(([rate,count])=>({rate:parseFloat(rate),count}));
+  const total=sFreqData.reduce((s,d)=>s+d.count,0);
+  let sorted=[...sFreqData];
+  if(sFreqSort==='asc')sorted.sort((a,b)=>a.rate-b.rate);
+  else if(sFreqSort==='desc')sorted.sort((a,b)=>b.rate-a.rate);
+  else sorted.sort((a,b)=>b.count-a.count);
+  const maxCount=Math.max(...sorted.map(d=>d.count));
+  const rows=sorted.map(d=>{
+    const pct=(d.count/total*100).toFixed(2);
+    const isTop=d.count===maxCount;
+    const barW=Math.round(d.count/maxCount*80);
+    return `<tr${isTop?' class="hi"':''}><td>${d.rate.toFixed(2)}%</td><td>${d.count.toLocaleString('ko-KR')}번</td><td>${pct}%</td><td style="text-align:left;padding-left:4px"><div style="display:inline-block;height:10px;width:${barW}px;min-width:2px;background:var(--accent);border-radius:2px;vertical-align:middle"></div></td></tr>`;
+  }).join('');
+  $('s-freq-tbl').innerHTML=`<tr><th>사정률 (%)</th><th>빈도</th><th>확률</th><th style="text-align:left">분포</th></tr>${rows}`;
+  $('s-freq-total').textContent=`총 ${total.toLocaleString('ko-KR')}회`;
+  $('s-freq-section').style.display='';
+}
+
+$('s-freq-sort').addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;
+  sFreqSort=b.dataset.fs;
+  [...$('s-freq-sort').children].forEach(x=>x.classList.toggle('active',x===b));
+  sRenderFreq();
+});
+
+$('s-to-calc').addEventListener('click',()=>{
+  $('c-base').value=$('base').value;
+  if(sFreqData.length){
+    const sorted=[...sFreqData].sort((a,b)=>a.rate-b.rate);
+    $('c-rates').value=sorted.map(d=>d.rate.toFixed(2)).join('\n');
+    cCm='manual';
+    [...$('c-mode').children].forEach(x=>x.classList.toggle('active',x.dataset.cm==='manual'));
+    $('c-manual-wrap').style.display='';
+    $('c-range-wrap').style.display='none';
+  }
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active',b.dataset.tab==='calc'));
+  document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active',p.id==='tab-calc'));
+});
 
 $('exportCsv').addEventListener('click',()=>{
   if(!sRuns.length)return;
@@ -837,11 +906,12 @@ $('c-step').addEventListener('click',e=>{
 
 // 숫자 포맷 입력
 ['c-base','c-aval','c-rev-bid'].forEach(id=>{
-  const el=$( id);
+  const el=$(id);
   if(!el)return;
   el.addEventListener('input',e=>{
     const v=e.target.value.replace(/[^\d]/g,'');
     e.target.value=v?Number(v).toLocaleString('ko-KR'):'';
+    if(id==='c-base')$('base').value=e.target.value;
   });
 });
 
