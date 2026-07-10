@@ -140,21 +140,8 @@ code.inline{background:var(--grid);padding:1px 5px;border-radius:4px;font-size:1
 tr.best-row td{background:#fef9c3;font-weight:700;}
 tr.near-row td{background:#f0fdf4;}
 
-/* ── ANIME MASCOT ── */
-#m-wrap{position:fixed;bottom:18px;right:16px;z-index:9999;display:flex;flex-direction:column;align-items:center;gap:7px;pointer-events:none;}
-#m-svg{width:110px;height:155px;cursor:pointer;filter:drop-shadow(0 6px 18px rgba(0,0,0,.22));animation:mFl 3.5s ease-in-out infinite;pointer-events:all;transition:transform .15s;}
-#m-svg:hover{transform:scale(1.07) translateY(-5px)!important;animation-play-state:paused;}
-@keyframes mFl{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
-.mex #m-svg{animation:mBnc .22s ease-in-out 5!important;}
-@keyframes mBnc{0%,100%{transform:scale(1)}50%{transform:scale(1.13) translateY(-7px)}}
-#m-bbl{background:#fff9fc;border:2.5px solid #ffc0d5;border-radius:18px 18px 4px 18px;padding:10px 14px;font-size:12.5px;font-weight:700;color:#44223a;max-width:185px;line-height:1.6;box-shadow:0 6px 24px rgba(200,80,130,.2);cursor:pointer;pointer-events:all;position:relative;opacity:0;transform:scale(.85) translateY(6px);transition:opacity .22s,transform .22s cubic-bezier(.18,.89,.32,1.28);}
-#m-bbl.on{opacity:1;transform:scale(1) translateY(0);}
-#m-bbl::after{content:'';position:absolute;bottom:-13px;right:22px;border:6.5px solid transparent;border-top-color:#ffc0d5;}
-.msp{position:fixed;pointer-events:none;z-index:9998;animation:mSpk 1.4s ease-out forwards;}
-@keyframes mSpk{0%{opacity:1;transform:translate(0,0) scale(1) rotate(0)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(0) rotate(540deg)}}
-/* Floating deco stars in header */
-.deco-star{position:absolute;pointer-events:none;animation:dStar 4s ease-in-out infinite;}
-@keyframes dStar{0%,100%{opacity:.25;transform:scale(1) rotate(0)}50%{opacity:.55;transform:scale(1.2) rotate(15deg)}}
+/* ── ASUNA ICON ── */
+.asi{display:inline-block;vertical-align:middle;margin-right:5px;flex-shrink:0;}
 </style>
 </head>
 <body>
@@ -162,9 +149,9 @@ tr.near-row td{background:#f0fdf4;}
 <!-- ── TABS ── -->
 <div class="tabs-wrap">
   <div class="tabs">
-    <button class="tab-btn active" data-tab="sim">📊 시뮬레이션</button>
-    <button class="tab-btn" data-tab="analysis">📈 분석 &amp; 예측</button>
-    <button class="tab-btn" data-tab="calc">💰 투찰 계산기</button>
+    <button class="tab-btn active" data-tab="sim"><svg class="asi" viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="9.5" r="7.5" fill="#c87a28"/><circle cx="10" cy="10.5" r="6" fill="#fce8d0"/><circle cx="7.5" cy="10" r="2" fill="#4488ee"/><circle cx="7.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="6.8" cy="9.2" r=".6" fill="white"/><circle cx="12.5" cy="10" r="2" fill="#4488ee"/><circle cx="12.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="11.8" cy="9.2" r=".6" fill="white"/><ellipse cx="5" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><ellipse cx="15" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><path d="M7.5,13.5 Q10,16 12.5,13.5" stroke="#d44070" stroke-width=".9" fill="none" stroke-linecap="round"/><path d="M3,9 Q3.5,3 10,2 Q16.5,3 17,9 Q14,5.5 10,5 Q6,5.5 3,9" fill="#d4882e"/><path d="M14.5,3.5 Q12.5,1.5 11.5,3.5 Q12.5,5.5 14.5,3.5" fill="#ff3d7f"/><path d="M14.5,3.5 Q16.5,1.5 17.5,3.5 Q16.5,5.5 14.5,3.5" fill="#ff3d7f"/><circle cx="14.5" cy="3.5" r="1.5" fill="#ffd0e8"/></svg>📊 시뮬레이션</button>
+    <button class="tab-btn" data-tab="analysis"><svg class="asi" viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="9.5" r="7.5" fill="#c87a28"/><circle cx="10" cy="10.5" r="6" fill="#fce8d0"/><circle cx="7.5" cy="10" r="2" fill="#4488ee"/><circle cx="7.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="6.8" cy="9.2" r=".6" fill="white"/><circle cx="12.5" cy="10" r="2" fill="#4488ee"/><circle cx="12.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="11.8" cy="9.2" r=".6" fill="white"/><ellipse cx="5" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><ellipse cx="15" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><path d="M7.5,13.5 Q10,16 12.5,13.5" stroke="#d44070" stroke-width=".9" fill="none" stroke-linecap="round"/><path d="M3,9 Q3.5,3 10,2 Q16.5,3 17,9 Q14,5.5 10,5 Q6,5.5 3,9" fill="#d4882e"/><path d="M14.5,3.5 Q12.5,1.5 11.5,3.5 Q12.5,5.5 14.5,3.5" fill="#ff3d7f"/><path d="M14.5,3.5 Q16.5,1.5 17.5,3.5 Q16.5,5.5 14.5,3.5" fill="#ff3d7f"/><circle cx="14.5" cy="3.5" r="1.5" fill="#ffd0e8"/></svg>📈 분석 &amp; 예측</button>
+    <button class="tab-btn" data-tab="calc"><svg class="asi" viewBox="0 0 20 20" width="16" height="16" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="9.5" r="7.5" fill="#c87a28"/><circle cx="10" cy="10.5" r="6" fill="#fce8d0"/><circle cx="7.5" cy="10" r="2" fill="#4488ee"/><circle cx="7.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="6.8" cy="9.2" r=".6" fill="white"/><circle cx="12.5" cy="10" r="2" fill="#4488ee"/><circle cx="12.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="11.8" cy="9.2" r=".6" fill="white"/><ellipse cx="5" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><ellipse cx="15" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><path d="M7.5,13.5 Q10,16 12.5,13.5" stroke="#d44070" stroke-width=".9" fill="none" stroke-linecap="round"/><path d="M3,9 Q3.5,3 10,2 Q16.5,3 17,9 Q14,5.5 10,5 Q6,5.5 3,9" fill="#d4882e"/><path d="M14.5,3.5 Q12.5,1.5 11.5,3.5 Q12.5,5.5 14.5,3.5" fill="#ff3d7f"/><path d="M14.5,3.5 Q16.5,1.5 17.5,3.5 Q16.5,5.5 14.5,3.5" fill="#ff3d7f"/><circle cx="14.5" cy="3.5" r="1.5" fill="#ffd0e8"/></svg>💰 투찰 계산기</button>
   </div>
 </div>
 
@@ -175,7 +162,7 @@ tr.near-row td{background:#f0fdf4;}
 ════════════════════════════════════════ -->
 <div id="tab-sim" class="tab-panel active">
   <div class="page-header">
-    <h1>낙찰 가격 도출 시뮬레이터</h1>
+    <h1><svg class="asi" viewBox="0 0 20 20" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="9.5" r="7.5" fill="#c87a28"/><circle cx="10" cy="10.5" r="6" fill="#fce8d0"/><circle cx="7.5" cy="10" r="2" fill="#4488ee"/><circle cx="7.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="6.8" cy="9.2" r=".6" fill="white"/><circle cx="12.5" cy="10" r="2" fill="#4488ee"/><circle cx="12.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="11.8" cy="9.2" r=".6" fill="white"/><ellipse cx="5" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><ellipse cx="15" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><path d="M7.5,13.5 Q10,16 12.5,13.5" stroke="#d44070" stroke-width=".9" fill="none" stroke-linecap="round"/><path d="M3,9 Q3.5,3 10,2 Q16.5,3 17,9 Q14,5.5 10,5 Q6,5.5 3,9" fill="#d4882e"/><path d="M14.5,3.5 Q12.5,1.5 11.5,3.5 Q12.5,5.5 14.5,3.5" fill="#ff3d7f"/><path d="M14.5,3.5 Q16.5,1.5 17.5,3.5 Q16.5,5.5 14.5,3.5" fill="#ff3d7f"/><circle cx="14.5" cy="3.5" r="1.5" fill="#ffd0e8"/></svg>낙찰 가격 도출 시뮬레이터</h1>
     <p>복수예비가격 15개 추첨 → 4개 평균 → 기준가격 산출 → 최저 입찰 낙찰</p>
   </div>
   <div class="layout">
@@ -261,7 +248,7 @@ tr.near-row td{background:#f0fdf4;}
 ════════════════════════════════════════ -->
 <div id="tab-analysis" class="tab-panel">
   <div class="page-header">
-    <h1>낙찰률 분석 &amp; 예측</h1>
+    <h1><svg class="asi" viewBox="0 0 20 20" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="9.5" r="7.5" fill="#c87a28"/><circle cx="10" cy="10.5" r="6" fill="#fce8d0"/><circle cx="7.5" cy="10" r="2" fill="#4488ee"/><circle cx="7.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="6.8" cy="9.2" r=".6" fill="white"/><circle cx="12.5" cy="10" r="2" fill="#4488ee"/><circle cx="12.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="11.8" cy="9.2" r=".6" fill="white"/><ellipse cx="5" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><ellipse cx="15" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><path d="M7.5,13.5 Q10,16 12.5,13.5" stroke="#d44070" stroke-width=".9" fill="none" stroke-linecap="round"/><path d="M3,9 Q3.5,3 10,2 Q16.5,3 17,9 Q14,5.5 10,5 Q6,5.5 3,9" fill="#d4882e"/><path d="M14.5,3.5 Q12.5,1.5 11.5,3.5 Q12.5,5.5 14.5,3.5" fill="#ff3d7f"/><path d="M14.5,3.5 Q16.5,1.5 17.5,3.5 Q16.5,5.5 14.5,3.5" fill="#ff3d7f"/><circle cx="14.5" cy="3.5" r="1.5" fill="#ffd0e8"/></svg>낙찰률 분석 &amp; 예측</h1>
     <p>과거 낙찰 데이터 입력 → 추이 시각화 → 분포 분석 → 다음 낙찰률 예측</p>
   </div>
   <div class="layout">
@@ -377,7 +364,7 @@ tr.near-row td{background:#f0fdf4;}
 ════════════════════════════════════════ -->
 <div id="tab-calc" class="tab-panel">
   <div class="page-header">
-    <h1>투찰 금액 계산기</h1>
+    <h1><svg class="asi" viewBox="0 0 20 20" width="20" height="20" xmlns="http://www.w3.org/2000/svg"><circle cx="10" cy="9.5" r="7.5" fill="#c87a28"/><circle cx="10" cy="10.5" r="6" fill="#fce8d0"/><circle cx="7.5" cy="10" r="2" fill="#4488ee"/><circle cx="7.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="6.8" cy="9.2" r=".6" fill="white"/><circle cx="12.5" cy="10" r="2" fill="#4488ee"/><circle cx="12.5" cy="10" r="1.3" fill="#0d1848"/><circle cx="11.8" cy="9.2" r=".6" fill="white"/><ellipse cx="5" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><ellipse cx="15" cy="12" rx="1.5" ry=".8" fill="#ffaac8" opacity=".6"/><path d="M7.5,13.5 Q10,16 12.5,13.5" stroke="#d44070" stroke-width=".9" fill="none" stroke-linecap="round"/><path d="M3,9 Q3.5,3 10,2 Q16.5,3 17,9 Q14,5.5 10,5 Q6,5.5 3,9" fill="#d4882e"/><path d="M14.5,3.5 Q12.5,1.5 11.5,3.5 Q12.5,5.5 14.5,3.5" fill="#ff3d7f"/><path d="M14.5,3.5 Q16.5,1.5 17.5,3.5 Q16.5,5.5 14.5,3.5" fill="#ff3d7f"/><circle cx="14.5" cy="3.5" r="1.5" fill="#ffd0e8"/></svg>투찰 금액 계산기</h1>
     <p>사정률 → 투찰금액 계산 (소수점 이하 절상) · 투찰금액 역산</p>
   </div>
   <div class="layout">
@@ -491,10 +478,7 @@ tr.near-row td{background:#f0fdf4;}
 
 </div><!-- /wrap -->
 
-<!-- ══════════════════════════════════════
-     ANIME MASCOT (Asuna-style chibi)
-════════════════════════════════════════ -->
-<div id="m-wrap">
+<div id="m-wrap" style="display:none">
   <div id="m-bbl">💕 안녕~ 낙찰 도우미야!</div>
   <svg id="m-svg" width="110" height="155" viewBox="0 0 110 155" xmlns="http://www.w3.org/2000/svg">
 
@@ -685,7 +669,6 @@ $('run').addEventListener('click',()=>{
   sRuns.push({cfg,batch,ts:Date.now()});
   sRender();
   sRenderFreq();
-  if(typeof mShow==='function')mShow(`${trials.toLocaleString('ko-KR')}번 완료! 결과를 확인해봐요 🎉`,true);
 });
 
 $('clearAll').addEventListener('click',()=>{if(confirm('모든 시뮬레이션 결과를 지웁니다.')){sRuns=[];sRender();}});
@@ -1191,67 +1174,6 @@ $('c-export').addEventListener('click',()=>{
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='touchal_calc.csv';a.click();
 });
 
-/* ── ANIME MASCOT JS ── */
-const mMsgs=[
-  '안녕~ 낙찰 도우미 아스나야! 💕',
-  '시뮬레이션 10,000번으로 더 정확하게! ✨',
-  '빈도 높은 사정률이 당신의 노림수예요 🎯',
-  '→ 버튼으로 투찰 계산기와 바로 연동해요!',
-  '기준가보다 1원이라도 낮아야 낙찰 💰',
-  '과거 데이터가 많을수록 예측도 정확해! 📊',
-  '화이팅! 이번엔 꼭 낙찰되길 바라요 ⚔️✨',
-  '소수점 2자리 빈도 분석으로 전략을 세워요 🧠',
-];
-let mIdx=0,mTimer=null;
-
-function mSetExpr(state){
-  $('m-eh').style.display=state==='happy'?'':'none';
-  $('m-ex').style.display=state==='excited'?'':'none';
-  $('m-et').style.display=state==='think'?'':'none';
-}
-
-function mShow(msg,excited){
-  const b=$('m-bbl');
-  b.textContent=msg||mMsgs[mIdx++%mMsgs.length];
-  b.classList.remove('on');void b.offsetWidth;b.classList.add('on');
-  clearTimeout(mTimer);mTimer=setTimeout(()=>b.classList.remove('on'),5000);
-  if(excited){
-    const w=document.getElementById('m-wrap');
-    mSetExpr('excited');
-    w.classList.add('mex');
-    for(let i=0;i<10;i++)setTimeout(mSpk,i*80);
-    setTimeout(()=>{w.classList.remove('mex');mSetExpr('happy');},1800);
-  }
-}
-
-function mSpk(){
-  const el=document.createElement('div');el.className='msp';
-  const px=window.innerWidth-200+Math.random()*180;
-  const py=window.innerHeight-240+Math.random()*140;
-  const dx=(Math.random()-.5)*110, dy=-(45+Math.random()*100);
-  const clrs=['#ff80aa','#ffd700','#a78bfa','#60c8ff','#ff9960','#80ffb8'];
-  const syms='✦★♡✿◆✸🌸';
-  el.style.cssText=`left:${px}px;top:${py}px;--dx:${dx}px;--dy:${dy}px;font-size:${14+Math.random()*12}px;color:${clrs[Math.floor(Math.random()*clrs.length)]}`;
-  el.textContent=syms[Math.floor(Math.random()*syms.length)];
-  document.body.appendChild(el);setTimeout(()=>el.remove(),1500);
-}
-
-// Click mascot → tip
-$('m-svg').addEventListener('click',()=>mShow());
-// Click bubble → next tip
-$('m-bbl').addEventListener('click',()=>mShow());
-
-// Tabs switch → show relevant tip
-document.querySelectorAll('.tab-btn').forEach(btn=>{
-  btn.addEventListener('click',()=>{
-    const t=btn.dataset.tab;
-    const tips={sim:'시뮬레이션 탭이에요! 먼저 기본금액을 설정해봐요 📊',analysis:'과거 낙찰률을 입력하면 예측도 해줘요! 📈',calc:'사정률을 입력하면 투찰금액을 계산해줘요 💰'};
-    if(tips[t])setTimeout(()=>mShow(tips[t]),300);
-  });
-});
-
-// Initial greeting after 1.5s
-setTimeout(()=>mShow('안녕~ 낙찰 도우미 아스나야! 클릭하면 도움말을 알려줄게요 💕'),1500);
 </script>
 </body>
 </html>
