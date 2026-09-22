@@ -70,7 +70,7 @@ const LINKS = [
   },
 ]
 
-const BASE_URL = 'https://my-site-six-sepia.vercel.app'
+const BASE_URL = 'https://yoonjae-dev.vercel.app'
 
 export default function DocsPage() {
   return (
