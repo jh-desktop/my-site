@@ -13,6 +13,14 @@ const DOCS = [
     file: '/ClarkTravel.apk',
     icon: '📱',
   },
+  {
+    id: 3,
+    title: '계약서 (표준 양식)',
+    desc: '용역·업무 위탁용 표준 계약서 양식 (Word)',
+    file: '/contract-standard-form.docx',
+    downloadName: '계약서 (표준 양식).docx',
+    icon: '📄',
+  },
 ]
 
 const LINKS = [
@@ -103,7 +111,7 @@ export default function DocsPage() {
                   <a href={viewerUrl} target="_blank" rel="noreferrer" className="card-link">
                     보기 ↗
                   </a>
-                  <a href={doc.file} download className="card-no-link" style={{ cursor: 'pointer', textDecoration: 'none' }}>
+                  <a href={doc.file} download={doc.downloadName || true} className="card-no-link" style={{ cursor: 'pointer', textDecoration: 'none' }}>
                     ⬇ 다운로드
                   </a>
                 </div>
